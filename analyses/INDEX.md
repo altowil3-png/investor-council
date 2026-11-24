@@ -11,7 +11,7 @@
 <!-- AUTO-SUMMARY:INDEX:START -->
 | Ticker | บริษัท | ราคา ณ วันที่ | สถานะ v4 | เพดาน Starter | เพดาน Core | ไฟล์ |
 | :--- | :--- | :---: | :--- | :---: | :---: | :--- |
-| **BKNG** | Booking Holdings Inc. | $146 (2026-11-23) | **Watchlist** | ~$125 (ช่วง $120–$130) | ~$115 (ช่วง $110–$120) | [BKNG-booking-holdings.md](./us/BKNG-booking-holdings.md) |
+| **BKNG** | Booking Holdings Inc. | $146 (2026-11-23) | **Watchlist** | ~$120 (ช่วง $115–$125) | ~$110 (ช่วง $110–$115) | [BKNG-booking-holdings.md](./us/BKNG-booking-holdings.md) |
 <!-- AUTO-SUMMARY:INDEX:END -->
 
 แก้ตัวเลขที่ `inputs/TICKER.json` แล้วรัน `python3 tools/sync_summaries.py --write`
@@ -24,6 +24,7 @@
 
 | Ticker | ชื่อบริษัท | ราคาวันวิเคราะห์ | ข้อสรุปเดิม (ยังไม่ผ่าน v4) | วันที่ | ไฟล์ |
 | :--- | :--- | :---: | :--- | :---: | :--- |
+| **BKNG (v2)** | Booking Holdings Inc. — ฉบับ AGV เก็บไว้เทียบ | ~$146 | BUY / สะสม $137–$148 — ⚠️ ถูกแทนที่ด้วยฉบับ v4 ในตารางแรก | 23 พ.ย. 2026 | [BKNG-booking-holdings-v2-agv.md](./us/BKNG-booking-holdings-v2-agv.md) `[LEGACY v1 — Pending v4 Re-audit]` |
 | **SYK** | Stryker Corporation | ~$310 | Starter $295–$310 / Core ≤ $275–$285 — ⚠️ ขัดกฎ v4 เอง: ผลตอบแทนกรณีฐาน ~10% ต่ำกว่าด่าน 11% | 23 พ.ย. 2026 | [SYK-stryker.md](./us/SYK-stryker.md) `[LEGACY v1 — Pending v4 Re-audit]` |
 | **UBER** | Uber Technologies, Inc. | ~$64.07 | Small Starter (2%–3%) $60–$64 / Core ≤ $55–$58 / Fat Pitch ≤ $48–$50 | 23 พ.ย. 2026 | [UBER-uber-technologies.md](./us/UBER-uber-technologies.md) `[LEGACY v1 — Pending v4 Re-audit]` |
 | **GOOGL** | Alphabet Inc. | ~$283.93 | Watchlist — Starter ≤ $255–$260 / Core ≤ $230–$245 | 23 พ.ย. 2026 | [GOOGL-alphabet.md](./us/GOOGL-alphabet.md) `[LEGACY v1 — Pending v4 Re-audit]` |

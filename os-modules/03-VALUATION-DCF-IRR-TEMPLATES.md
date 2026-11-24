@@ -70,10 +70,12 @@
 | **4. Bull Case (Thesis Realized)** | กลยุทธ์หลักสำเร็จ (เช่น Direct Mix สูงขึ้น, AI ลดต้นทุนจริง, Operating Leverage ทำงาน) | โตตามเป้าผู้บริหารแต่ยังไม่เกิน Base Rate โครงสร้างอุตสาหกรรม |
 
 ### กฎเหล็ก Reinvestment & Explicit Cash Drags
-1. **Growth Cannot Be Free (Implied Reinvestment Sanity Check):** ทุก Scenario ต้องเช็ก `Implied Reinvestment Rate = g / Assumed Incremental ROIC` (รันให้อัตโนมัติใน `valuation_engine.py` v3) — หากธุรกิจ ROIIC 15% แต่อยากโต 12%/ปี แปลว่าต้องนำกำไรถึง 80% กลับไปลง CapEx + ΔNWC (ห้ามโมเดลว่าโต 12% โดยไม่ต้องเพิ่มทุนหมุนเวียนหรือ CapEx!)
+1. **Growth Cannot Be Free (Implied Reinvestment Sanity Check):** ทุก Scenario ต้องเช็ก `Implied Reinvestment Rate = g / Assumed Incremental ROIC` (รันให้อัตโนมัติใน `valuation_engine.py`) — หากธุรกิจ ROIIC 15% แต่อยากโต 12%/ปี แปลว่าต้องนำกำไรถึง 80% กลับไปลง CapEx + ΔNWC (ห้ามโมเดลว่าโต 12% โดยไม่ต้องเพิ่มทุนหมุนเวียนหรือ CapEx!)
 2. **Pending M&A Cash Outflow:** หากบริษัทประกาศซื้อกิจการด้วยเงินสด/หนี้เพิ่มแล้วแต่ยังไม่ปิดดีล ต้องหักเงินสดจ่ายสุทธิ (หรือเพิ่ม Net Debt) ทันที — *ระวังอย่าหักซ้ำทั้งใน EV และ `pv_cash_drag`*
 3. **Regulatory Fines / Litigation Settlement:** ใส่เป็น `One-time Cash Outflow` ในปีที่คาดว่าจะจ่ายจริง (ถ้าใส่ใน Float-Adj EV แล้ว ห้ามหักซ้ำใน `pv_cash_drag`)
 4. **AI / Maintenance CapEx Surge:** ใช้ CapEx Run-Rate ใหม่ที่เกิดขึ้นจริง ไม่ใช่ค่าเฉลี่ยอดีต
+5. **มูลค่าปลายทางแยกตาม Scenario (v4):** ห้ามใช้การโตตลอดไป 2.5% เท่ากันทุกกรณีโดยอัตโนมัติ — ใน `inputs/TICKER.json` แต่ละ scenario กำหนด `terminal_growth` หรือ `exit_ev_ufcf_multiple` ของตัวเองได้ (เลือกอย่างใดอย่างหนึ่ง) เช่น กรณีหมีของธุรกิจที่เสี่ยงถูก AI ตัดตอนใช้โต 0% หรือตัวคูณ 8–10 เท่า
+   * **ห้ามฮาร์ดโค้ดกรณีหมี = −50% เท่ากันทุกหุ้น:** ความลึกของกรณีหมีต้องมาจากกลไกของธุรกิจนั้น (margin, หนี้, มูลค่าปลายทาง) ไม่เช่นนั้นอัตราได้ต่อเสียจะแยกหุ้นคุณภาพออกจากหุ้นหนี้สูงไม่ได้ — ตัวเลข −50% ใช้ใน pre-mortem (โมดูล `05` §4) เพื่อหาสาเหตุที่พัง ไม่ใช่ใส่เป็นค่าคงที่ในโมเดล
 
 ---
 
@@ -108,7 +110,7 @@ $$0 = -P_0 + \sum_{t=1}^{5} \frac{D_t}{(1+\text{IRR})^t} + \frac{\text{Price}_5}
 เวลาจะตัดสินใจกดซื้อจริง นักลงทุนต้องการคำตอบตรงไปตรงมาว่า:
 > **"ณ ราคาวันนี้ ถ้าฉันต้องการผลตอบแทน 10%, 12% หรือ 15% ต่อปีในอีก 5 ปีข้างหน้า — บริษัทต้องทำ Clean FCF และ Revenue โตปีละกี่ %?"**
 
-ให้สร้างตารางมาตรฐานนี้ทุกครั้งก่อนสรุป Action Plan (รันอัตโนมัติได้จาก `valuation_engine.py` v3):
+ให้สร้างตารางมาตรฐานนี้ทุกครั้งก่อนสรุป Action Plan (รันอัตโนมัติได้จาก `valuation_engine.py`):
 
 | กรณี Exit Multiple ในปีที่ 5 | เป้า 5Y IRR = **10%/ปี** (Bare Minimum) | เป้า 5Y IRR = **12%/ปี** (Institutional Target) | เป้า 5Y IRR = **15%/ปี** (Rochon Double in 5Y) |
 | :--- | :--- | :--- | :--- |
@@ -118,31 +120,35 @@ $$0 = -P_0 + \sum_{t=1}^{5} \frac{D_t}{(1+\text{IRR})^t} + \frac{\text{Price}_5}
 
 ---
 
-## 7. เพดานราคาเข้าซื้อหุ้นเดี่ยว (Single-Stock Entry Ceilings — 3-Lens Binding Rule)
+## 7. เพดานราคาเข้าซื้อหุ้นเดี่ยว (Single-Stock Entry Ceilings — v4: 2 เลนส์ราคา + ด่านผลตอบแทน)
 
 > [!IMPORTANT]
-> **ขอบเขตของหมวดนี้:** ตารางนี้กำหนดเฉพาะ **"เพดานราคาของหุ้น 1 ตัว (Single-Stock Ceilings)"** เท่านั้น — **ไม่กำหนดสัดส่วน % พอร์ต** กติกาขนาดพอร์ตทั้งหมด (รวมถึงนิยาม Watchlist 0%, เงื่อนไขข้อยกเว้น Tracking Position และ Pre-Sizing Portfolio Gate) ให้ยึดตาม **[05-PORTFOLIO-SIZING-RISK-SELL-DISCIPLINE.md](./05-PORTFOLIO-SIZING-RISK-SELL-DISCIPLINE.md) §2 (Single Source of Truth)** เพียงแห่งเดียว
+> **ขอบเขตของหมวดนี้:** กำหนดเฉพาะ **"เพดานราคาของหุ้น 1 ตัว"** — **ไม่กำหนดสัดส่วน % พอร์ต** กติกาขนาดพอร์ตทั้งหมดยึด **[05-PORTFOLIO-SIZING-RISK-SELL-DISCIPLINE.md](./05-PORTFOLIO-SIZING-RISK-SELL-DISCIPLINE.md) §2** เพียงแห่งเดียว
 
-| ระดับเพดานราคา (Single-Stock Tier) | Lens A: ส่วนลดจาก Audited Base DCF | Lens B: 5Y Constant-Multiple IRR | Lens C: Risk/Reward (Upside ถึง Base : Downside ถึง Bear) | สถานะต่อยอดสู่โมดูล `05` |
+> [!WARNING]
+> **ทำไม v4 ถอดเลนส์ B ออกจากเพดานราคา:** ผลตอบแทน 5 ปีแบบตัวคูณคงที่แทบไม่ขึ้นกับราคาซื้อ (ตัวอย่าง BKNG รุ่นทดสอบ: ซื้อ \$146 ได้ 13.3%, ซื้อ \$200 ยังได้ 11.3%) มันจึงวัด "อัตราโต" ไม่ใช่ "ราคา" — เมื่อใช้เป็นเพดาน อัตราโตเปลี่ยนแค่ ±1 จุด เพดานไม้แรกแกว่งจาก \$176 ถึง \$270 และยังทำให้ข้อยกเว้น "ผ่าน 2 ใน 3 เลนส์" กลายเป็นช่องโหว่ เพราะเลนส์ B แทบผ่านเสมอ
+
+| ระดับเพดานราคา | Lens A: ส่วนเผื่อความปลอดภัยเทียบมูลค่ากรณีฐาน | Lens C: อัตราได้ต่อเสีย (ขึ้นถึงกรณีฐาน : ลงถึงกรณีหมี) | ด่านผลตอบแทน 5 ปี ณ ราคาวันนี้ (ตัวคูณคงที่) | ต่อยอดสู่โมดูล `05` |
 | :--- | :---: | :---: | :---: | :--- |
-| **Unqualified / Watchlist** | ไม่ผ่านเกณฑ์ Starter ข้อใดข้อหนึ่ง (หรือ Lens B = `IMPOSSIBLE / INFEASIBLE`) | — | — | ส่งต่อ `Tier 0B` (0%) หรือตรวจเงื่อนไขข้อยกเว้น `Tier 0C` ในโมดูล `05` §2 |
-| **Starter Ceiling** | **≥ 15%** | **≥ 11%** | **≥ 2.0 : 1** | ผ่านเกณฑ์ราคาเพื่อเข้าตรวจ Pre-Sizing Gate (`Tier 1–2` ในโมดูล `05`) |
-| **Core Ceiling** | **≥ 25%** | **≥ 13%** | **≥ 3.0 : 1** | ผ่านเกณฑ์ราคาเพื่อเข้าตรวจ Pre-Sizing Gate (`Tier 3` ในโมดูล `05`) |
-| **Fat Pitch Ceiling** | **≥ 35%** | **≥ 15%** | **≥ 4.0 : 1** | ผ่านเกณฑ์ราคาเพื่อเข้าตรวจ Pre-Sizing Gate (`Tier 4` ในโมดูล `05`) |
+| **Watchlist** | ไม่ผ่านเพดาน Starter หรือไม่ผ่านด่านผลตอบแทน | — | — | `Tier 0` (0%) |
+| **Starter** | **≥ 15%** | **≥ 2.0 : 1** | **≥ 11%** | `Tier 1–2` |
+| **Core** | **≥ 25%** | **≥ 3.0 : 1** | **≥ 13%** | `Tier 3` |
+| **Fat Pitch** | **≥ 35%** | **≥ 4.0 : 1** | **≥ 15%** | `Tier 4` |
 
-### กฎผูกมัด & การตรวจสถานะคำตอบ (Binding Rule + Solver Status)
-1. **เพดานราคาของแต่ละโซน = ราคาที่ต่ำที่สุดในบรรดา 3 เลนส์** (`min(Lens A, Lens B, Lens C)`) และต้องบอกเสมอว่า **เลนส์ไหนเป็นตัวผูกมัด**
-2. สูตร Lens C ปิดรูป: `ราคาเพดาน = (Base FV + k × Bear FV) / (1 + k)` เมื่อ `k` = R/R ขั้นต่ำ
-3. **นิยาม Lens B แบบเข้มงวด + สถานะตัวหาคำตอบ (`valuation_engine.py` v3):**
-   * Exit Multiple = Multiple ที่ *คุณจ่ายจริง ณ ราคาเข้าซื้อ* (ไม่ให้เครดิตว่า Multiple จะเด้งกลับ)
-   * ตัวหาคำตอบต้องรายงานสถานะชัดเจน: `SOLVED` (มีราคาและตรวจ IRR ซ้ำผ่าน), `UNBOUNDED_PASS` (การโตสูงกว่าเป้าอยู่แล้วทุกช่วงราคา — Lens B ไม่จำกัดเพดาน), `IMPOSSIBLE` (เป้าหมายเป็นไปไม่ได้ภายใต้สมมติฐาน เช่น ไม่จ่ายปันผล/ไม่ซื้อคืนและโตต่ำกว่าเป้า), `INFEASIBLE_CASH_PLAN` (แผนเงินสด/ปันผลขาดเงิน), หรือ `UNBRACKETED`
-   * **หากสถานะเป็น `IMPOSSIBLE / INFEASIBLE / UNBRACKETED` โซนนั้นต้องถูกขึ้นสถานะ `UNQUALIFIED` ทันที** (ห้ามคืนขอบล่าง `$1.00` มาแสดงเป็นราคาซื้อเด็ดขาด!)
-4. ทุกช่วงราคาที่เขียนในบทวิเคราะห์/README ต้องมีป้ายกำกับที่มา เช่น `[Binding 3-Lens]`, `[Lens B: Exit pinned 13.4x]`, `[Lens A only]`
+### กฎผูกมัด (v4)
+1. **เพดานราคา = `min(Lens A, Lens C)`** — 2 เลนส์ที่ขึ้นกับราคาจริงเท่านั้น และต้องบอกเสมอว่าเลนส์ไหนผูกมัด
+2. สูตร Lens C ปิดรูป: `ราคาเพดาน = (มูลค่ากรณีฐาน + k × มูลค่ากรณีหมี) / (1 + k)` เมื่อ `k` = อัตราได้ต่อเสียขั้นต่ำ
+3. **ด่านผลตอบแทน (Quality/Growth Hurdle Gate):** ผลตอบแทน 5 ปีแบบตัวคูณคงที่ **ณ ราคาวันนี้** ต้องไม่ต่ำกว่าเกณฑ์ของขั้นนั้น — ถ้าต่ำกว่า 11% ไม่ผ่าน Starter แม้ราคาจะต่ำกว่าเพดาน (กันกรณีราคาถูกแต่ธุรกิจหดตัว = กับดักมูลค่า) ตาราง Cash Ledger 5 ปีและตาราง Required Growth ยังต้องรายงานทุกครั้ง
+4. **ห้ามประกาศเพดานราคาระดับเซนต์:** ต้องรายงานเป็น **ช่วงราคาปัดเศษ** (อัตราโตกรณีฐาน ±1 จุด) พร้อม **ตารางความอ่อนไหว ±1 และ ±2 จุด** ซึ่ง `valuation_engine.py` v4 สร้างให้อัตโนมัติ
+5. **ไม่มีข้อยกเว้น "ผ่าน 2 ใน 3 เลนส์" อีกต่อไป** — ไม่ผ่าน = Watchlist (0%)
+6. ฟังก์ชัน `solve_price_for_constant_multiple_irr()` (สถานะ `SOLVED / IMPOSSIBLE / UNBOUNDED_PASS / INFEASIBLE_CASH_PLAN`) ยังเก็บไว้ใช้ตอบคำถาม "ราคาเท่าไรถึงได้ IRR x%" แต่ **ห้ามนำผลไปเป็นเพดานราคา**
 
 ---
 
-## 8. วิธีใช้งานคู่กับ `valuation_engine.py` (v3)
+## 8. วิธีใช้งานคู่กับ `valuation_engine.py` (v4)
 
-1. รันรายงานหลัก: `python3 os-modules/valuation_engine.py` (แก้เฉพาะบล็อก `COMPANY_DATA` ด้านบน)
-2. รันชุดทดสอบตรวจสอบความถูกต้อง (Adversarial Acceptance Suite): `python3 os-modules/valuation_engine.py --self-test`
-3. หากใช้งานบน **AI ที่รัน Python ไม่ได้**: ให้คัดลอกสูตรทั้งหมดจาก `valuation_engine.py` v3 รวมทั้ง **Cash Ledger 5 ปี** และ **Reconciliation Bridge** สั่งให้ AI แสดงวิธีทำทีละบรรทัดแล้วตรวจทานบนเครื่องตัวเอง
+1. **ตัวเลขทุกตัวอยู่ใน `inputs/TICKER.json`** (ตัวอย่างต้นแบบ: `inputs/BKNG.json`) — ข้อเท็จจริงทุกตัวต้องมี `as_of_date` + (`source_url` หรือ `filing_ref`) + `verification` (`verified` / `partially_verified` / `carried_over_unverified`) และสมมติฐานทุกตัวต้องมี `rationale` ไม่ครบ = สคริปต์ไม่ยอมรัน
+2. รันรายงาน: `python3 os-modules/valuation_engine.py --input inputs/BKNG.json`
+3. สร้างบล็อกสรุปลงบทวิเคราะห์/README/INDEX: `python3 tools/sync_summaries.py --write` — **ห้ามพิมพ์ตัวเลขสรุปเองด้วยมือ** CI จะรัน `--check` และไม่ให้ผ่านถ้าตัวเลขไม่ตรงกับสคริปต์
+4. รันชุดทดสอบ: `python3 os-modules/valuation_engine.py --self-test` (9 เคสเดิมจาก v3 + เคส v4)
+5. หากใช้งานบน **AI ที่รัน Python ไม่ได้**: ให้คัดลอกสูตรจาก `valuation_engine.py` สั่งให้ AI แสดงวิธีทำทีละบรรทัด แล้วตรวจทานบนเครื่องตัวเองก่อนสร้าง JSON

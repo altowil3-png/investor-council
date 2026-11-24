@@ -1,5 +1,9 @@
 # Uber Technologies, Inc. (`NYSE: UBER`) — Institutional Fundamental Analysis & True Split-Brain Debate
 
+> [!CAUTION]
+> **`[LEGACY v1 — Pending v4 Re-audit]`** — บทวิเคราะห์นี้ทำก่อนกฎ v4: ตัวเลขไม่มีลิงก์แหล่งอ้างอิง ไม่ได้ผูกกับ `valuation_engine.py` และยังใช้เกณฑ์เพดานราคาแบบเก่า (รวมเลนส์ B และข้อยกเว้น "ผ่าน 2 ใน 3") **ห้ามใช้ข้อสรุปหรือโซนราคาในไฟล์นี้ตัดสินใจลงเงิน** จนกว่าจะสร้าง `inputs/TICKER.json` และรันใหม่ด้วย v4 — ตัวเลขในไฟล์นี้ยังไม่ได้แก้ (ตั้งใจไม่เดาเลขใหม่)
+
+
 * **วันที่วิเคราะห์:** 23 พฤศจิกายน 2026 (อ้างอิงงบ Q3 2026 Form 10-Q สิ้นสุด 30 ก.ย. 2026, ดีล Delivery Hero ก.ค. 2026, ดีล DoorDash–Instacart 29 ต.ค. 2026, และ Zoox บน Uber 16 พ.ย. 2026)
 * **ราคาหุ้นอ้างอิง:** \$64.07 *(52W Range: \$63.29 – \$92.78 | ATH \$100.10 ต.ค. 2025 | Diluted MCap: \$131.36B | Chairman Adjusted Core EV: \$137.00B)*
 * **เกณฑ์อ้างอิงไร้ความเสี่ยง (Risk-Free Benchmark):** US 10Y Treasury Yield **4.93%**

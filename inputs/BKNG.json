@@ -1,0 +1,182 @@
+{
+  "schema_version": "4.0",
+  "ticker": "BKNG",
+  "company_name": "Booking Holdings Inc.",
+  "as_of_date": "2026-11-23",
+  "currency": "USD",
+  "analysis_path": "analyses/us/BKNG-booking-holdings.md",
+  "_units": "เงินทุกตัวหน่วย $ ล้าน ยกเว้นราคาหุ้นและปันผลต่อหุ้นเป็น $ ต่อหุ้น, อัตราเป็นทศนิยม (0.0925 = 9.25%)",
+  "_verification_levels": {
+    "verified": "เทียบตรงกับเอกสารยื่นทางการแล้ว",
+    "partially_verified": "เทียบได้บางส่วน (เช่น ส่วน 9 เดือนตรงกับ 10-Q แต่ส่วนของ 10-K ยังไม่ได้เทียบ หรือเป็นตัวเลขที่ปรับปรุงจากตัวเลขที่ตรวจแล้ว)",
+    "carried_over_unverified": "ยกมาจากบทวิเคราะห์ v2 ของ AGV ยังไม่ได้เทียบเอกสารยื่นทางการ"
+  },
+
+  "facts": {
+    "share_price": {
+      "value": 146.0, "unit": "USD/share", "as_of_date": "2026-11-23",
+      "source_url": "",
+      "filing_ref": "ราคาอ้างอิงจาก BKNG analysis v2 (AGV): ปิด 20 พ.ย. 2026 $144.91, ใช้ $146.00",
+      "verification": "carried_over_unverified",
+      "note": "ยังหาแหล่งยืนยันราคาวันที่ 20–23 พ.ย. ไม่ได้; ราคาปิดล่าสุดที่ตรวจได้คือ $159.58 (13 พ.ย. 2026, financialcontent.com) — ต้องเช็กราคาสดก่อนตัดสินใจ"
+    },
+    "diluted_shares_m": {
+      "value": 749.0, "unit": "million shares", "as_of_date": "2026-10-26",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001075531/000107553126000045/bkng-20260930.htm",
+      "filing_ref": "Form 10-Q Q3 2026: หุ้นคงค้าง 743,701,257 หุ้น (หน้าปก, 26 ต.ค. 2026); หุ้นเจือจางเฉลี่ย Q3 = 753M",
+      "verification": "partially_verified",
+      "note": "749M เป็นค่าประมาณของ AGV (หุ้นคงค้าง + ผลเจือจาง) ไม่ใช่ตัวเลขที่รายงานตรง"
+    },
+    "risk_free_yield": {
+      "value": 0.0493, "unit": "rate", "as_of_date": "2026-11-23",
+      "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates",
+      "filing_ref": "US Treasury 10Y par yield",
+      "verification": "carried_over_unverified",
+      "note": "ค่าจากบทวิเคราะห์ v2 ยังไม่ได้เทียบตารางของกระทรวงการคลังสหรัฐฯ"
+    },
+    "total_debt": {
+      "value": 20652.0, "unit": "USD m", "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001075531/000107553126000045/bkng-20260930.htm",
+      "filing_ref": "Form 10-Q Q3 2026 งบดุล: หนี้ระยะสั้น $1,987M + หนี้ระยะยาว $18,074M = $20,061M; บวกหนี้สินตามสัญญาเช่า (ไม่หมุนเวียน $515M + หมุนเวียน ~$76M)",
+      "verification": "partially_verified",
+      "note": "ยอดหนี้ $20,061M ตรวจแล้ว; ส่วนหนี้สัญญาเช่าหมุนเวียน ~$76M ยังไม่ได้ตรวจ"
+    },
+    "total_cash_and_st_inv": {
+      "value": 16249.0, "unit": "USD m", "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001075531/000107553126000045/bkng-20260930.htm",
+      "filing_ref": "Form 10-Q Q3 2026 งบดุล: เงินสดและรายการเทียบเท่า $15,814M + เงินลงทุนระยะยาว $435M",
+      "verification": "verified",
+      "note": "รวมเงินลงทุนระยะยาว $435M ไว้ด้วย"
+    },
+    "customer_float_liability": {
+      "value": 7450.0, "unit": "USD m", "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001075531/000107553126000045/bkng-20260930.htm",
+      "filing_ref": "Form 10-Q Q3 2026: Deferred merchant bookings $6,450M + ภาระคดี FTC $1,000M (ลดรายได้ $900M ตรวจแล้ว + ค่าใช้จ่ายบริหาร ~$100M ตามบทวิเคราะห์ v2)",
+      "verification": "partially_verified",
+      "note": "เงินรับล่วงหน้าจากลูกค้า $6,450M และการลดรายได้ FTC $900M ตรวจแล้ว; ส่วน $100M ยังไม่ได้ตรวจ"
+    },
+    "minority_interest": {
+      "value": 0.0, "unit": "USD m", "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001075531/000107553126000045/bkng-20260930.htm",
+      "filing_ref": "Form 10-Q Q3 2026 งบดุล (ไม่มีรายการส่วนได้เสียที่ไม่มีอำนาจควบคุม)",
+      "verification": "carried_over_unverified",
+      "note": ""
+    },
+    "ttm_revenue": {
+      "value": 29026.0, "unit": "USD m", "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001075531/000107553126000045/bkng-20260930.htm",
+      "filing_ref": "รายได้ 12 เดือนย้อนหลังตาม GAAP $28,126M + บวกกลับรายการลดรายได้ FTC $900M (10-Q Q3 2026)",
+      "verification": "partially_verified",
+      "note": "การลดรายได้ FTC $900M ตรวจแล้ว; ยอดรายได้ 12 เดือนรวมจาก FY2025 10-K ยังไม่ได้ตรวจ"
+    },
+    "ttm_core_gaap_ebit": {
+      "value": 10219.0, "unit": "USD m", "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001075531/000107553126000045/bkng-20260930.htm",
+      "filing_ref": "10-Q Q3 2026: กำไรจากการดำเนินงาน 9 เดือน $7,189M (ปีก่อน $6,795M) + FY2025 10-K; บวกกลับคดี FTC $1.0B",
+      "verification": "partially_verified",
+      "note": "ตัวเลขปรับปรุงโดยนักวิเคราะห์; ส่วน 9 เดือนตรวจแล้ว"
+    },
+    "ttm_depreciation_amort": {
+      "value": 372.0, "unit": "USD m", "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001075531/000107553126000045/bkng-20260930.htm",
+      "filing_ref": "10-Q Q3 2026: ค่าเสื่อมราคาและค่าตัดจำหน่าย 9 เดือน $443M (ปีก่อน $472M); ตัวเลข 12 เดือนนี้ตัดค่าตัดจำหน่ายสินทรัพย์จากการซื้อกิจการออก",
+      "verification": "carried_over_unverified",
+      "note": "ตัวเลขปรับปรุงโดย AGV ยังกระทบยอดไม่ได้"
+    },
+    "ttm_capex": {
+      "value": 324.0, "unit": "USD m", "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001075531/000107553126000045/bkng-20260930.htm",
+      "filing_ref": "10-Q Q3 2026: Additions to property and equipment 9 เดือน $251M (ปีก่อน $249M) + FY2025 10-K",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_sbc": {
+      "value": 594.0, "unit": "USD m", "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001075531/000107553126000045/bkng-20260930.htm",
+      "filing_ref": "10-Q Q3 2026: Stock-based compensation 9 เดือน $427M (ปีก่อน $450M) + FY2025 10-K",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_ocf": {
+      "value": 9561.0, "unit": "USD m", "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001075531/000107553126000045/bkng-20260930.htm",
+      "filing_ref": "10-Q Q3 2026: Net cash provided by operating activities 9 เดือน $8,071M (ปีก่อน $7,919M) + FY2025 10-K",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_net_interest_expense": {
+      "value": 310.0, "unit": "USD m", "as_of_date": "2026-09-30",
+      "source_url": "",
+      "filing_ref": "ดอกเบี้ยจ่ายหักดอกเบี้ยรับ 12 เดือนย้อนหลัง (10-Q Q3 2026 + FY2025 10-K) — ยกมาจากบทวิเคราะห์ v2",
+      "verification": "carried_over_unverified",
+      "note": ""
+    },
+    "annual_dividend_per_share": {
+      "value": 1.68, "unit": "USD/share", "as_of_date": "2026-11-23",
+      "source_url": "",
+      "filing_ref": "ปันผลรายไตรมาสหลังแตกพาร์ $0.42 × 4 — ยกมาจากบทวิเคราะห์ v2",
+      "verification": "carried_over_unverified",
+      "note": ""
+    }
+  },
+
+  "assumptions": {
+    "effective_tax_rate": {"value": 0.21, "rationale": "อัตราภาษีเงินสดในภาวะปกติ 21% ตามบทวิเคราะห์ v2 (ยังไม่ได้เทียบอัตราภาษีจริงใน 10-K)"},
+    "ttm_normal_working_capital_investment": {"value": 0.0, "rationale": "ธุรกิจมีเงินทุนหมุนเวียนติดลบ จึงตั้งเงินทุนหมุนเวียนปกติเป็น 0 และแยกเงินไหลเข้าจาก float ไปไว้ในบรรทัด ttm_float_inflow"},
+    "ttm_float_inflow": {"value": 493.0, "rationale": "ส่วนของกระแสเงินสดที่มาจาก float และเงินทุนหมุนเวียนซึ่งไม่ยั่งยืน (ประมาณการของ AGV) เนื้อหาในบทวิเคราะห์ประเมินไว้แค่ $210M จึงถือว่าตัวนี้เป็นฝั่งระวัง"},
+    "float_cash_coverage_ratio": {"value": 1.0, "rationale": "หักเงินลูกค้าทั้งก้อนออกจากเงินสด ซึ่งเข้มงวดที่สุด"},
+    "wacc": {"value": 0.0925, "rationale": "พันธบัตร 10 ปี 4.93% บวกส่วนชดเชยความเสี่ยงหุ้นราว 4.3% สำหรับธุรกิจที่คาดการณ์ได้ปานกลาง (ตารางในโมดูล 03 §2)"},
+    "terminal_growth": {"value": 0.025, "rationale": "ค่าเริ่มต้นราวเงินเฟ้อระยะยาว ใช้เฉพาะ scenario ที่ไม่ได้กำหนดเอง (กรณีหมีกำหนดแยกไว้)"},
+    "assumed_incremental_roic": {"value": 0.35, "rationale": "ใช้ตรวจความสมเหตุสมผลของอัตราการลงทุนซ้ำ (อัตราโต ÷ ROIC ส่วนเพิ่ม)"},
+    "operating_leverage_factor": {"value": 1.0, "rationale": "สมมติให้ margin คงที่ FCF จึงโตเท่ารายได้"}
+  },
+
+  "reverse_dcf_cases": [
+    {"label": "Flat margin, no extra fine",     "margin_change_5y": 0.000, "fine_m": 0.0,    "fine_year": 2},
+    {"label": "Flat margin, EU fine $0.8B",     "margin_change_5y": 0.000, "fine_m": 800.0,  "fine_year": 2},
+    {"label": "-100 bps margin, EU fine $0.8B", "margin_change_5y": -0.010, "fine_m": 800.0, "fine_year": 2},
+    {"label": "-300 bps margin, fines $2.0B",   "margin_change_5y": -0.030, "fine_m": 2000.0, "fine_year": 2}
+  ],
+
+  "dcf_scenarios": {
+    "Bear (AI + EU Squeeze)": {
+      "ufcf_cagr_1_5": -0.025, "ufcf_cagr_6_10": 0.010, "pv_cash_drag": 1250.0,
+      "terminal_growth": 0.0,
+      "driver_note": "Rev +2%, Margin -500bps, EU fine $1.5B; โตตลอดไป 0% เพราะกรณีหมีคือ AI agent ตัดตอนช่องทางจองหน้าแรก ไม่ควรให้ธุรกิจโตตลอดไปปีละ 2.5%"
+    },
+    "Conservative (Slowdown Floor)": {
+      "ufcf_cagr_1_5": 0.025, "ufcf_cagr_6_10": 0.030, "pv_cash_drag": 840.0,
+      "driver_note": "Rev +4.5%, Margin -250bps, EU fine $1.0B"
+    },
+    "Base (Audited Reality)": {
+      "ufcf_cagr_1_5": 0.062, "ufcf_cagr_6_10": 0.050, "pv_cash_drag": 670.0,
+      "driver_note": "Rev +7.0%, Margin -100bps, EU fine $0.8B"
+    },
+    "Bull (Thesis Realized)": {
+      "ufcf_cagr_1_5": 0.097, "ufcf_cagr_6_10": 0.065, "pv_cash_drag": 420.0,
+      "driver_note": "Rev +9.0%, Margin +100bps, EU fine $0.5B"
+    }
+  },
+
+  "irr_model": {
+    "base_clean_fcf_growth": 0.062,
+    "dividend_growth_rate": 0.070,
+    "fcf_allocation_to_buybacks": 0.85,
+    "annual_cash_drag_m": 160.0,
+    "dividend_funding_policy": "strict_fail",
+    "after_tax_debt_cost": 0.045,
+    "exit_multiple_scenarios": {
+      "De-rating (-15% Multiple)": 0.85,
+      "Constant-Multiple Case (1.00x)": 1.00,
+      "Mild Re-rating (+15% Multiple)": 1.15
+    }
+  },
+
+  "entry_zone_rules": [
+    {"tier": "Starter",   "min_mos": 0.15, "min_const_mult_irr": 0.11, "min_rr": 2.0},
+    {"tier": "Core",      "min_mos": 0.25, "min_const_mult_irr": 0.13, "min_rr": 3.0},
+    {"tier": "Fat Pitch", "min_mos": 0.35, "min_const_mult_irr": 0.15, "min_rr": 4.0}
+  ],
+
+  "sensitivity_growth_deltas": [-0.02, -0.01, 0.0, 0.01, 0.02]
+}

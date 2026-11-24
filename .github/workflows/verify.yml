@@ -27,13 +27,28 @@ jobs:
             os-modules/03-VALUATION-DCF-IRR-TEMPLATES.md \
             os-modules/04-SPLIT-BRAIN-DEBATE-PROMPTS.md \
             os-modules/05-PORTFOLIO-SIZING-RISK-SELL-DISCIPLINE.md \
-            os-modules/valuation_engine.py; do
+            os-modules/valuation_engine.py \
+            tools/sync_summaries.py \
+            inputs/BKNG.json; do
             test -s "$f" || { echo "Missing or empty: $f"; exit 1; }
           done
-          echo "All 7 core OS module files present."
+          echo "All core files present."
 
-      - name: Run adversarial valuation self-test suite
+      - name: Run adversarial valuation self-test suite (9 legacy v3 + v4 tests)
         run: python3 os-modules/valuation_engine.py --self-test
 
-      - name: Run default valuation report smoke test
-        run: python3 os-modules/valuation_engine.py > /dev/null && echo "Default report OK"
+      - name: Smoke test — legacy v3 fixture report
+        run: python3 os-modules/valuation_engine.py > /dev/null && echo "Legacy fixture report OK"
+
+      - name: Smoke test — v4 report for every inputs/*.json
+        run: |
+          for f in inputs/*.json; do
+            python3 os-modules/valuation_engine.py --input "$f" > /dev/null || { echo "Report failed: $f"; exit 1; }
+            echo "v4 report OK: $f"
+          done
+
+      - name: Drift check tool self-test
+        run: python3 tools/sync_summaries.py --self-test
+
+      - name: Drift check — markdown/README/INDEX must match inputs/*.json via the engine
+        run: python3 tools/sync_summaries.py --check

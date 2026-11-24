@@ -1,8 +1,23 @@
 #!/usr/bin/env python3
 """
-Institutional Investing OS — Standalone Valuation & Forensic Engine (v3)
+Institutional Investing OS — Standalone Valuation & Forensic Engine (v4)
 =======================================================================
 Zero external dependencies (Python 3 standard library only).
+
+v4 changelog (Claude review + AGV conditions, Nov 24 2026):
+  1. JSON INPUTS WITH PROVENANCE: `--input inputs/TICKER.json`. Every reported fact must carry
+     `as_of_date` + (`source_url` or `filing_ref`) + `verification`; every judgment carries a `rationale`.
+     `validate_company_json()` rejects files that break this contract.
+  2. PER-SCENARIO TERMINAL VALUE: each DCF scenario may set its own `terminal_growth` or
+     `exit_ev_ufcf_multiple` (e.g. Bear for AI-disruption risk = 0% growth) instead of one global 2.5%.
+  3. PRICE CEILINGS USE ONLY PRICE-DEPENDENT LENSES: ceiling = min(Lens A: MOS vs Base DCF,
+     Lens C: Risk/Reward vs Bear). The Constant-Multiple 5Y IRR is no longer a price ceiling (it barely
+     moves with entry price); it is now a HURDLE GATE evaluated at today's price (tier min IRR).
+  4. SENSITIVITY & ROUNDED RANGES: ceilings are reported as rounded ranges for Base growth ±1pp, with a
+     full ±1pp / ±2pp sensitivity table. Cent-level ceilings are no longer published as verdicts.
+  5. AUTO SUMMARY: `build_summary()` + `render_*()` feed `tools/sync_summaries.py`, which writes the
+     generated blocks into analysis/README/INDEX and fails CI on drift (`--check`).
+  The 9 legacy v3 acceptance tests are kept unchanged; v4 tests are appended after them.
 
 v3 changelog (external audit round 2, Nov 24 2026):
   1. CASH LEDGER & DIVIDEND FUNDING GATE:
@@ -30,19 +45,28 @@ v3 changelog (external audit round 2, Nov 24 2026):
        (see Module 05 SSOT) before assigning any % portfolio weight.
 
 Usage:
-  python3 valuation_engine.py              # Run full report on COMPANY_DATA
-  python3 valuation_engine.py --self-test  # Run built-in adversarial verification suite
+  python3 valuation_engine.py --input inputs/BKNG.json               # Full v4 report from a JSON input file
+  python3 valuation_engine.py --input inputs/BKNG.json --summary-md  # Generated summary block (markdown)
+  python3 valuation_engine.py --input inputs/BKNG.json --summary-json
+  python3 valuation_engine.py                                        # Legacy v3 fixture (regression only)
+  python3 valuation_engine.py --self-test                            # Legacy + v4 acceptance suite
 """
 
 from __future__ import annotations
 from copy import deepcopy
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
+import json
+import math
+import os
+import re
 import sys
 
 
 # ==============================================================================
-# 1. INPUT PARAMETERS (Illustrative Pre-Filled Example: BKNG — Audited Nov 2026)
+# 1. LEGACY v3 FIXTURE (BKNG — frozen Nov 2026 example used by the regression tests)
+#    Live analysis inputs now live in `inputs/TICKER.json` (with provenance per number).
+#    Do NOT edit these values to update an analysis — edit the JSON file instead.
 #    All dollar figures in $ Millions, except per-share price ($) and DPS ($).
 # ==============================================================================
 COMPANY_DATA: Dict[str, object] = {
@@ -326,17 +350,27 @@ def dcf_enterprise_value(
     wacc: float,
     g_term: float,
     pv_cash_drag: float = 0.0,
+    exit_multiple: Optional[float] = None,
 ) -> float:
-    """Standard 10-year Explicit DCF + Gordon Growth Terminal Value."""
-    if wacc <= g_term:
+    """10-year Explicit DCF + terminal value.
+
+    Terminal value = Gordon Growth on year-10 UFCF (default), or — when `exit_multiple` is given —
+    year-10 UFCF x exit EV/UFCF multiple (v4: lets a Bear case use e.g. 8-10x instead of a growth formula).
+    """
+    if exit_multiple is None and wacc <= g_term:
         raise ValueError("WACC must be strictly greater than terminal growth rate.")
+    if exit_multiple is not None and exit_multiple <= 0.0:
+        raise ValueError("Exit EV/UFCF multiple must be positive.")
     pv = 0.0
     cf = ufcf_0
     for yr in range(1, 11):
         g = g_1_5 if yr <= 5 else g_6_10
         cf *= (1.0 + g)
         pv += cf / ((1.0 + wacc) ** yr)
-    tv = cf * (1.0 + g_term) / (wacc - g_term)
+    if exit_multiple is not None:
+        tv = cf * exit_multiple
+    else:
+        tv = cf * (1.0 + g_term) / (wacc - g_term)
     return pv + tv / ((1.0 + wacc) ** 10) - pv_cash_drag
 
 
@@ -650,11 +684,391 @@ def solve_price_for_constant_multiple_irr(
 
 
 # ==============================================================================
+# 2b. v4 — JSON INPUTS (PROVENANCE), PER-SCENARIO TERMINAL VALUE,
+#     2-LENS PRICE CEILINGS + IRR HURDLE GATE, SENSITIVITY RANGES, SUMMARY
+# ==============================================================================
+SCHEMA_VERSION = "4.0"
+
+# Reported numbers: each needs as_of_date + (source_url or filing_ref) + verification level.
+FACT_FIELDS: Tuple[str, ...] = (
+    "share_price", "diluted_shares_m", "risk_free_yield",
+    "total_debt", "total_cash_and_st_inv", "customer_float_liability", "minority_interest",
+    "ttm_revenue", "ttm_core_gaap_ebit", "ttm_depreciation_amort", "ttm_capex", "ttm_sbc",
+    "ttm_ocf", "ttm_net_interest_expense", "annual_dividend_per_share",
+)
+# Analyst judgments: each needs a written rationale.
+ASSUMPTION_FIELDS: Tuple[str, ...] = (
+    "effective_tax_rate", "ttm_normal_working_capital_investment", "ttm_float_inflow",
+    "float_cash_coverage_ratio", "wacc", "terminal_growth", "assumed_incremental_roic",
+    "operating_leverage_factor",
+)
+VERIFICATION_LEVELS: Tuple[str, ...] = ("verified", "partially_verified", "carried_over_unverified")
+DEFAULT_SENSITIVITY_DELTAS: Tuple[float, ...] = (-0.02, -0.01, 0.0, 0.01, 0.02)
+_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _is_number(x: object) -> bool:
+    return isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(float(x))
+
+
+def validate_company_json(raw: Dict[str, object]) -> List[str]:
+    """Returns a list of human-readable errors (empty list = valid v4 input file)."""
+    errs: List[str] = []
+    for key in ("schema_version", "ticker", "company_name", "as_of_date", "currency", "facts",
+                "assumptions", "reverse_dcf_cases", "dcf_scenarios", "irr_model", "entry_zone_rules"):
+        if key not in raw:
+            errs.append(f"missing top-level key: {key}")
+    if errs:
+        return errs
+    if str(raw["schema_version"]).split(".")[0] != SCHEMA_VERSION.split(".")[0]:
+        errs.append(f"schema_version {raw['schema_version']} != {SCHEMA_VERSION}")
+    if not _DATE_RE.match(str(raw["as_of_date"])):
+        errs.append("as_of_date must be YYYY-MM-DD")
+
+    facts = raw["facts"]
+    for k in FACT_FIELDS:
+        f = facts.get(k) if isinstance(facts, dict) else None
+        if not isinstance(f, dict):
+            errs.append(f"facts.{k}: missing")
+            continue
+        if not _is_number(f.get("value")):
+            errs.append(f"facts.{k}: value must be a number")
+        if not _DATE_RE.match(str(f.get("as_of_date", ""))):
+            errs.append(f"facts.{k}: as_of_date must be YYYY-MM-DD")
+        if not (str(f.get("source_url", "")).strip() or str(f.get("filing_ref", "")).strip()):
+            errs.append(f"facts.{k}: needs source_url or filing_ref")
+        if f.get("verification") not in VERIFICATION_LEVELS:
+            errs.append(f"facts.{k}: verification must be one of {VERIFICATION_LEVELS}")
+
+    assumptions = raw["assumptions"]
+    for k in ASSUMPTION_FIELDS:
+        a = assumptions.get(k) if isinstance(assumptions, dict) else None
+        if not isinstance(a, dict):
+            errs.append(f"assumptions.{k}: missing")
+            continue
+        if not _is_number(a.get("value")):
+            errs.append(f"assumptions.{k}: value must be a number")
+        if not str(a.get("rationale", "")).strip():
+            errs.append(f"assumptions.{k}: needs a rationale")
+
+    wacc = assumptions.get("wacc", {}).get("value") if isinstance(assumptions, dict) else None
+    scen = raw["dcf_scenarios"]
+    if not isinstance(scen, dict) or not any(n.startswith("Base") for n in scen) or not any(n.startswith("Bear") for n in scen):
+        errs.append("dcf_scenarios must include one 'Base...' and one 'Bear...' scenario")
+    elif isinstance(scen, dict):
+        for name, cfg in scen.items():
+            for k in ("ufcf_cagr_1_5", "ufcf_cagr_6_10", "pv_cash_drag"):
+                if not _is_number(cfg.get(k)):
+                    errs.append(f"dcf_scenarios.{name}.{k}: must be a number")
+            if "terminal_growth" in cfg and "exit_ev_ufcf_multiple" in cfg:
+                errs.append(f"dcf_scenarios.{name}: set terminal_growth OR exit_ev_ufcf_multiple, not both")
+            if "terminal_growth" in cfg and _is_number(wacc) and float(cfg["terminal_growth"]) >= float(wacc):
+                errs.append(f"dcf_scenarios.{name}.terminal_growth must be < wacc")
+            if "exit_ev_ufcf_multiple" in cfg and not (_is_number(cfg["exit_ev_ufcf_multiple"]) and cfg["exit_ev_ufcf_multiple"] > 0):
+                errs.append(f"dcf_scenarios.{name}.exit_ev_ufcf_multiple must be > 0")
+            if not str(cfg.get("driver_note", "")).strip():
+                errs.append(f"dcf_scenarios.{name}: needs driver_note")
+
+    rules = raw["entry_zone_rules"]
+    if not isinstance(rules, list) or not rules:
+        errs.append("entry_zone_rules must be a non-empty list")
+    else:
+        for r in rules:
+            for k in ("min_mos", "min_const_mult_irr", "min_rr"):
+                if not _is_number(r.get(k)):
+                    errs.append(f"entry_zone_rules[{r.get('tier')}].{k}: must be a number")
+    return errs
+
+
+def company_dict_from_json(raw: Dict[str, object], source_path: str = "") -> Dict[str, object]:
+    """Flattens a validated v4 JSON document into the legacy engine dict (plus provenance metadata)."""
+    errs = validate_company_json(raw)
+    if errs:
+        raise ValueError("Invalid v4 input file:\n  - " + "\n  - ".join(errs))
+    d: Dict[str, object] = {
+        "ticker": raw["ticker"],
+        "company_name": raw["company_name"],
+        "as_of_date": raw["as_of_date"],
+        "currency": raw["currency"],
+        "analysis_path": raw.get("analysis_path", ""),
+    }
+    for k in FACT_FIELDS:
+        d[k] = float(raw["facts"][k]["value"])
+    for k in ASSUMPTION_FIELDS:
+        d[k] = float(raw["assumptions"][k]["value"])
+    for k in ("reverse_dcf_cases", "dcf_scenarios", "irr_model", "entry_zone_rules"):
+        d[k] = deepcopy(raw[k])
+    d["sensitivity_growth_deltas"] = list(raw.get("sensitivity_growth_deltas", DEFAULT_SENSITIVITY_DELTAS))
+    d["_provenance"] = {
+        level: sorted(k for k in FACT_FIELDS if raw["facts"][k]["verification"] == level)
+        for level in VERIFICATION_LEVELS
+    }
+    d["_source_path"] = source_path
+    return d
+
+
+def load_company_json(path: str) -> Dict[str, object]:
+    with open(path, "r", encoding="utf-8") as fh:
+        raw = json.load(fh)
+    return company_dict_from_json(raw, source_path=path)
+
+
+def _find_scenario(d: Dict[str, object], prefix: str) -> Tuple[str, Dict[str, object]]:
+    for name, cfg in d["dcf_scenarios"].items():
+        if name.startswith(prefix):
+            return name, cfg
+    raise ValueError(f"No DCF scenario starting with '{prefix}'")
+
+
+def scenario_terminal_label(d: Dict[str, object], cfg: Dict[str, object]) -> str:
+    if "exit_ev_ufcf_multiple" in cfg:
+        return f"exit {float(cfg['exit_ev_ufcf_multiple']):.1f}x"
+    return f"g {float(cfg.get('terminal_growth', d['terminal_growth']))*100:.1f}%"
+
+
+def scenario_fair_value(d: Dict[str, object], fs: ForensicSummary, cfg: Dict[str, object], growth_delta: float = 0.0) -> float:
+    """Per-share fair value of one DCF scenario; growth_delta shifts BOTH 1-5Y and 6-10Y UFCF growth."""
+    exit_mult = cfg.get("exit_ev_ufcf_multiple")
+    ev = dcf_enterprise_value(
+        fs.unlevered_fcf_pl,
+        float(cfg["ufcf_cagr_1_5"]) + growth_delta,
+        float(cfg["ufcf_cagr_6_10"]) + growth_delta,
+        float(d["wacc"]),
+        float(cfg.get("terminal_growth", d["terminal_growth"])),
+        float(cfg["pv_cash_drag"]),
+        exit_multiple=float(exit_mult) if exit_mult is not None else None,
+    )
+    return (ev - fs.float_adjusted_net_debt - float(d["minority_interest"])) / float(d["diluted_shares_m"])
+
+
+@dataclass
+class TierAssessment:
+    tier: str
+    min_mos: float
+    min_rr: float
+    min_irr: float
+    lens_a_mos: float          # price ceiling from MOS vs Base DCF
+    lens_c_rr: float           # price ceiling from Risk/Reward vs Bear
+    ceiling: float             # min(lens A, lens C)
+    binder: str                # "MOS" | "R/R"
+    price_ok: bool             # today's price <= ceiling
+    irr_gate_ok: bool          # Constant-Multiple 5Y IRR at today's price >= min_irr
+    qualifies_today: bool
+
+
+@dataclass
+class EntryAssessment:
+    growth_delta: float
+    price: float
+    base_fv: float
+    bear_fv: float
+    mos_today: float
+    rr_today: float
+    irr_today: Optional[float]
+    irr_status: str
+    tiers: List[TierAssessment]
+    tier_today: Optional[str]
+    reason: str
+
+
+def assess_entry(d: Dict[str, object], fs: ForensicSummary, growth_delta: float = 0.0) -> EntryAssessment:
+    """v4 entry assessment: price ceilings from Lens A + Lens C only; Constant-Multiple IRR = hurdle gate at today's price."""
+    price = float(d["share_price"])
+    _, base_cfg = _find_scenario(d, "Base")
+    _, bear_cfg = _find_scenario(d, "Bear")
+    base_fv = scenario_fair_value(d, fs, base_cfg, growth_delta)
+    bear_fv = scenario_fair_value(d, fs, bear_cfg, 0.0)
+
+    irr_res = simulate_5y_forward_irr(d, fs, float(d["irr_model"]["base_clean_fcf_growth"]) + growth_delta, 1.0)
+    irr_today = irr_res.irr if (irr_res.feasible and irr_res.irr is not None) else None
+
+    up = base_fv - price
+    down = price - bear_fv
+    rr_today = (up / down) if down > 1e-9 else float("inf")
+    mos_today = 1.0 - price / base_fv if base_fv > 0 else float("-inf")
+
+    tiers: List[TierAssessment] = []
+    tier_today: Optional[str] = None
+    for rule in d["entry_zone_rules"]:
+        mos, k, min_irr = float(rule["min_mos"]), float(rule["min_rr"]), float(rule["min_const_mult_irr"])
+        p_a = base_fv * (1.0 - mos)
+        p_c = (base_fv + k * bear_fv) / (1.0 + k)
+        ceiling, binder = (p_a, "MOS") if p_a <= p_c else (p_c, "R/R")
+        price_ok = price <= ceiling + 1e-9
+        gate_ok = irr_today is not None and irr_today >= min_irr - 1e-12
+        qualifies = price_ok and gate_ok
+        if qualifies:
+            tier_today = str(rule["tier"])
+        tiers.append(TierAssessment(str(rule["tier"]), mos, k, min_irr, p_a, p_c, ceiling, binder, price_ok, gate_ok, qualifies))
+
+    if tier_today is not None:
+        reason = f"ผ่านเกณฑ์ {tier_today}"
+    elif tiers and not tiers[0].price_ok:
+        reason = f"ราคาสูงกว่าเพดาน {tiers[0].tier}"
+    elif irr_today is None:
+        reason = f"แผนเงินสดเป็นไปไม่ได้ ({irr_res.status})"
+    else:
+        reason = f"ผลตอบแทน 5 ปี {irr_today*100:.1f}% ต่ำกว่าเกณฑ์ขั้นต่ำ {tiers[0].min_irr*100:.0f}%"
+    return EntryAssessment(growth_delta, price, base_fv, bear_fv, mos_today, rr_today, irr_today,
+                           irr_res.status, tiers, tier_today, reason)
+
+
+def price_step(p: float) -> float:
+    """Display rounding step so ceilings never look more precise than the inputs."""
+    p = abs(p)
+    if p < 20:
+        return 0.5
+    if p < 100:
+        return 1.0
+    if p < 500:
+        return 5.0
+    if p < 2000:
+        return 10.0
+    return 50.0
+
+
+def round_to_step(x: float, step: float) -> float:
+    return round(round(x / step) * step, 2)
+
+
+def _fmt_money(x: float) -> str:
+    return f"${x:,.0f}" if float(x).is_integer() else f"${x:,.2f}"
+
+
+def build_summary(d: Dict[str, object]) -> Dict[str, object]:
+    """Machine-readable v4 summary used for reports, generated markdown blocks and the CI drift check."""
+    fs = compute_forensic_metrics(d)
+    deltas = sorted(set([float(x) for x in d.get("sensitivity_growth_deltas", DEFAULT_SENSITIVITY_DELTAS)] + [-0.01, 0.0, 0.01]))
+    by_delta = {dl: assess_entry(d, fs, dl) for dl in deltas}
+    central = by_delta[0.0]
+    step = price_step(central.price)
+
+    tiers_out = []
+    for i, t in enumerate(central.tiers):
+        lo = round_to_step(by_delta[-0.01].tiers[i].ceiling, step)
+        hi = round_to_step(by_delta[0.01].tiers[i].ceiling, step)
+        tiers_out.append({
+            "tier": t.tier,
+            "rule": {"min_mos": t.min_mos, "min_rr": t.min_rr, "min_irr": t.min_irr},
+            "central": round_to_step(t.ceiling, step),
+            "range_low": min(lo, hi),
+            "range_high": max(lo, hi),
+            "binder": t.binder,
+            "irr_gate_ok_today": t.irr_gate_ok,
+            "qualifies_today": t.qualifies_today,
+        })
+
+    rows = []
+    for dl in deltas:
+        a = by_delta[dl]
+        rows.append({
+            "growth_delta_pp": round(dl * 100, 2),
+            "base_fv": round_to_step(a.base_fv, step),
+            "rr_today": round(a.rr_today, 2) if math.isfinite(a.rr_today) else None,
+            "irr_today_pct": round(a.irr_today * 100, 1) if a.irr_today is not None else None,
+            "ceilings": {t.tier: round_to_step(t.ceiling, step) for t in a.tiers},
+            "tier_today": a.tier_today or "Watchlist",
+        })
+
+    implied = solve_reverse_dcf_ufcf_cagr(fs.float_adjusted_ev, fs.unlevered_fcf_pl, float(d["wacc"]), float(d["terminal_growth"]))
+    prov = d.get("_provenance", {})
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "ticker": d["ticker"],
+        "company_name": d["company_name"],
+        "as_of_date": d["as_of_date"],
+        "currency": d.get("currency", "USD"),
+        "price": round(central.price, 2),
+        "rounding_step": step,
+        "base_fv": round_to_step(central.base_fv, step),
+        "bear_fv": round_to_step(central.bear_fv, step),
+        "bear_terminal": scenario_terminal_label(d, _find_scenario(d, "Bear")[1]),
+        "mos_today_pct": round(central.mos_today * 100, 1),
+        "rr_today": round(central.rr_today, 2) if math.isfinite(central.rr_today) else None,
+        "irr_today_pct": round(central.irr_today * 100, 1) if central.irr_today is not None else None,
+        "implied_ufcf_cagr_pct": round(implied * 100, 1) if implied is not None else None,
+        "clean_fcf_yield_pct": round(fs.clean_fcf_yield_mcap * 100, 2),
+        "tier_today": central.tier_today or "Watchlist",
+        "tier_reason": central.reason,
+        "tiers": tiers_out,
+        "sensitivity": rows,
+        "facts_unverified": list(prov.get("carried_over_unverified", [])),
+        "facts_partially_verified": list(prov.get("partially_verified", [])),
+        "input_file": os.path.relpath(str(d.get("_source_path", "")), _repo_root()) if d.get("_source_path") else "",
+        "analysis_path": d.get("analysis_path", ""),
+    }
+
+
+def _repo_root() -> str:
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _range_txt(t: Dict[str, object]) -> str:
+    return f"~{_fmt_money(t['central'])} (ช่วง {_fmt_money(t['range_low'])}–{_fmt_money(t['range_high'])})"
+
+
+def render_summary_block(s: Dict[str, object]) -> str:
+    """Generated block for the analysis file. Never hand-edit: run tools/sync_summaries.py --write."""
+    L: List[str] = []
+    L.append(f"> สร้างอัตโนมัติจาก `{s['input_file']}` ด้วย `valuation_engine.py` v4 — ห้ามแก้ด้วยมือ (รัน `python3 tools/sync_summaries.py --write`)")
+    L.append("")
+    L.append("| รายการ | ค่า (ณ " + str(s["as_of_date"]) + ") |")
+    L.append("| :--- | :--- |")
+    L.append(f"| ราคาอ้างอิง | {_fmt_money(s['price'])} |")
+    L.append(f"| **สถานะวันนี้ (ตามกฎ v4)** | **{s['tier_today']}** — {s['tier_reason']} |")
+    L.append(f"| มูลค่ากรณีฐาน / กรณีหมี | ~{_fmt_money(s['base_fv'])} / ~{_fmt_money(s['bear_fv'])} (กรณีหมีใช้ {s['bear_terminal']}) |")
+    L.append(f"| ส่วนเผื่อความปลอดภัยวันนี้ / อัตราได้ต่อเสีย | {s['mos_today_pct']}% / {s['rr_today']} : 1 |")
+    L.append(f"| ผลตอบแทน 5 ปี ณ ราคาวันนี้ (ตัวคูณคงที่ — ใช้เป็นด่านขั้นต่ำ ไม่ใช่เพดานราคา) | {s['irr_today_pct']}% |")
+    L.append(f"| ตลาดคาด UFCF โตปีละ (reverse DCF) | {s['implied_ufcf_cagr_pct']}% |")
+    for t in s["tiers"]:
+        r = t["rule"]
+        gate = "ผ่าน" if t["irr_gate_ok_today"] else "ไม่ผ่าน"
+        L.append(f"| เพดาน {t['tier']} (MOS ≥{r['min_mos']*100:.0f}%, ได้ต่อเสีย ≥{r['min_rr']:.0f}:1; ด่าน IRR ≥{r['min_irr']*100:.0f}% ณ ราคาวันนี้: {gate}) | {_range_txt(t)} — ผูกมัดโดย {t['binder']} |")
+    L.append("")
+    L.append("ตารางความอ่อนไหว (เลื่อนอัตราโต FCF กรณีฐานทั้ง 10 ปี):")
+    L.append("")
+    tier_names = [t["tier"] for t in s["tiers"]]
+    L.append("| อัตราโตเปลี่ยน | มูลค่าฐาน | IRR 5 ปีวันนี้ | ได้ต่อเสีย | " + " | ".join(f"เพดาน {n}" for n in tier_names) + " | สถานะ |")
+    L.append("| :---: | :---: | :---: | :---: | " + " | ".join(":---:" for _ in tier_names) + " | :--- |")
+    for r in s["sensitivity"]:
+        irr = f"{r['irr_today_pct']}%" if r["irr_today_pct"] is not None else "N/A"
+        rr = f"{r['rr_today']}" if r["rr_today"] is not None else "∞"
+        L.append(f"| {r['growth_delta_pp']:+.0f} จุด | {_fmt_money(r['base_fv'])} | {irr} | {rr} | "
+                 + " | ".join(_fmt_money(r["ceilings"][n]) for n in tier_names) + f" | {r['tier_today']} |")
+    if s["facts_unverified"] or s["facts_partially_verified"]:
+        L.append("")
+        L.append(f"⚠️ ตัวเลขที่ยังไม่ได้เทียบเอกสารยื่นทางการ: {', '.join(s['facts_unverified']) or '-'} | เทียบได้บางส่วน: {', '.join(s['facts_partially_verified']) or '-'}")
+    return "\n".join(L)
+
+
+def render_index_rows(summaries: List[Dict[str, object]]) -> str:
+    L = ["| Ticker | บริษัท | ราคา ณ วันที่ | สถานะ v4 | เพดาน Starter | เพดาน Core | ไฟล์ |",
+         "| :--- | :--- | :---: | :--- | :---: | :---: | :--- |"]
+    for s in summaries:
+        t = {x["tier"]: x for x in s["tiers"]}
+        st, co = t.get("Starter"), t.get("Core")
+        path = str(s["analysis_path"])
+        rel = path[len("analyses/"):] if path.startswith("analyses/") else path
+        L.append(f"| **{s['ticker']}** | {s['company_name']} | {_fmt_money(s['price'])} ({s['as_of_date']}) | **{s['tier_today']}** | "
+                 f"{_range_txt(st) if st else '-'} | {_range_txt(co) if co else '-'} | [{os.path.basename(path)}](./{rel}) |")
+    return "\n".join(L)
+
+
+def render_readme_items(summaries: List[Dict[str, object]]) -> str:
+    L = []
+    for s in summaries:
+        t = {x["tier"]: x for x in s["tiers"]}
+        st = t.get("Starter")
+        L.append(f"* [{s['ticker']} — {s['company_name']}](./{s['analysis_path']}) *(v4 ณ {s['as_of_date']} ที่ {_fmt_money(s['price'])} — "
+                 f"สถานะ: **{s['tier_today']}**; เพดาน Starter {_range_txt(st) if st else '-'}; ผลตอบแทน 5 ปี {s['irr_today_pct']}%)*")
+    return "\n".join(L)
+
+
+# ==============================================================================
 # 3. REPORT GENERATOR
 # ==============================================================================
 def run_valuation_report(d: Dict[str, object]) -> None:
     fs = compute_forensic_metrics(d)
-    shares = float(d["diluted_shares_m"])
     price = float(d["share_price"])
     wacc = float(d["wacc"])
     g_term = float(d["terminal_growth"])
@@ -662,7 +1076,7 @@ def run_valuation_report(d: Dict[str, object]) -> None:
     roiic = float(d.get("assumed_incremental_roic", 0.0))
 
     print("=" * 100)
-    print(f"INSTITUTIONAL VALUATION ENGINE v3 | {d['ticker']} — {d['company_name']} ({d.get('currency', 'USD')})")
+    print(f"INSTITUTIONAL VALUATION ENGINE v4 | {d['ticker']} — {d['company_name']} ({d.get('currency', 'USD')})")
     print(f"As of: {d['as_of_date']} | Price: ${price:,.2f} | Matched 10Y Rf: {rf*100:.2f}% | WACC: {wacc*100:.2f}%")
     print("=" * 100)
 
@@ -692,21 +1106,14 @@ def run_valuation_report(d: Dict[str, object]) -> None:
         rc_str = f"{rc*100:+.2f}% / yr" if rc is not None else "UNBRACKETED"
         print(f"  (b) Implied 10Y Revenue CAGR | {case['label']:<36}: {rc_str}")
 
-    print("\n[3] EXPLICIT 10-YEAR DCF (4 SCENARIOS + IMPLIED REINVESTMENT SANITY CHECK)")
-    print(f"  {'Scenario':<32} | {'1-5Y g':>6} | {'6-10Y g':>7} | {'Drag':>6} | {'Reinv*':>6} | {'Fair Val':>8} | {'Upside':>7}")
-    print("  " + "-" * 88)
-    base_fv = bear_fv = 0.0
+    print("\n[3] EXPLICIT 10-YEAR DCF (4 SCENARIOS, PER-SCENARIO TERMINAL VALUE + REINVESTMENT SANITY CHECK)")
+    print(f"  {'Scenario':<32} | {'1-5Y g':>6} | {'6-10Y g':>7} | {'Terminal':>10} | {'Drag':>6} | {'Reinv*':>6} | {'Fair Val':>8} | {'Upside':>7}")
+    print("  " + "-" * 101)
     for name, cfg in d["dcf_scenarios"].items():
         g15 = float(cfg["ufcf_cagr_1_5"])
-        ev_s = dcf_enterprise_value(fs.unlevered_fcf_pl, g15, float(cfg["ufcf_cagr_6_10"]),
-                                    wacc, g_term, float(cfg["pv_cash_drag"]))
-        fv = (ev_s - fs.float_adjusted_net_debt - float(d["minority_interest"])) / shares
-        if name.startswith("Base"):
-            base_fv = fv
-        if name.startswith("Bear"):
-            bear_fv = fv
+        fv = scenario_fair_value(d, fs, cfg)
         reinv_str = f"{max(0.0, g15)/roiic*100:>5.0f}%" if roiic > 0 else "  N/A "
-        print(f"  {name:<32} | {g15*100:>5.1f}% | {cfg['ufcf_cagr_6_10']*100:>6.1f}% | "
+        print(f"  {name:<32} | {g15*100:>5.1f}% | {cfg['ufcf_cagr_6_10']*100:>6.1f}% | {scenario_terminal_label(d, cfg):>10} | "
               f"{cfg['pv_cash_drag']:>6,.0f} | {reinv_str:>6} | ${fv:>7,.2f} | {(fv/price-1)*100:>+6.1f}%")
     if roiic > 0:
         print(f"  *Implied Reinvestment Rate = max(0, 1-5Y g) / Assumed Incremental ROIC ({roiic*100:.0f}%).")
@@ -746,47 +1153,32 @@ def run_valuation_report(d: Dict[str, object]) -> None:
             cols.append(f"{g_req*100:>5.1f}% / {g_req/op_lev*100:>5.1f}%" if g_req is not None else "    N/A /   N/A")
         print(f"  {label:<32} | {cols[0]:>19} | {cols[1]:>19} | {cols[2]:>19}")
 
-    print("\n[6] SINGLE-STOCK ENTRY CEILINGS — A: MOS vs Base DCF | B: Constant-Multiple IRR | C: Risk/Reward vs Bear")
-    up = max(0.0, base_fv / price - 1.0)
-    down = max(1e-4, 1.0 - bear_fv / price)
-    rr = up / down if bear_fv < price else float("inf")
-    print(f"  Audited Base Fair Value : ${base_fv:,.2f} | Bear Floor: ${bear_fv:,.2f} | Risk/Reward @ ${price:,.2f}: {rr:.2f} : 1")
-    print(f"  {'Tier':<10} | {'Rule MOS/IRR/RR':<16} | {'Lens A':>9} | {'Lens B (Status)':>19} | {'Lens C':>9} | {'BINDING CEILING':>17} | {'Binds'}")
-    print("  " + "-" * 98)
-    current_tier = "Watchlist / Unqualified"
-    for rule in d["entry_zone_rules"]:
-        p_a = base_fv * (1.0 - float(rule["min_mos"]))
-        sol_b = solve_price_for_constant_multiple_irr(d, fs, float(rule["min_const_mult_irr"]))
-        k = float(rule["min_rr"])
-        p_c = (base_fv + k * bear_fv) / (1.0 + k)
-        rule_txt = f"{rule['min_mos']*100:.0f}%/{rule['min_const_mult_irr']*100:.0f}%/{k:.0f}:1"
-
-        if sol_b.status == "SOLVED" and sol_b.price is not None:
-            b_disp = f"${sol_b.price:>8,.2f} (OK)"
-            candidates = {"MOS": p_a, "IRR": sol_b.price, "R/R": p_c}
-            binder = min(candidates, key=candidates.get)
-            ceiling = candidates[binder]
-            ceil_disp = f"<= ${ceiling:>10,.2f}"
-            if price <= ceiling:
-                current_tier = rule["tier"]
-        elif sol_b.status == "UNBOUNDED_PASS":
-            b_disp = "No Cap (PASS)"
-            candidates = {"MOS": p_a, "R/R": p_c}
-            binder = min(candidates, key=candidates.get)
-            ceiling = candidates[binder]
-            ceil_disp = f"<= ${ceiling:>10,.2f}"
-            if price <= ceiling:
-                current_tier = rule["tier"]
-        else:
-            b_disp = f"N/A ({sol_b.status[:10]})"
-            binder = f"FAIL:{sol_b.status}"
-            ceil_disp = "UNQUALIFIED"
-
-        print(f"  {rule['tier']:<10} | {rule_txt:<16} | ${p_a:>8,.2f} | {b_disp:>19} | ${p_c:>8,.2f} | {ceil_disp:>17} | {binder}")
-
-    cm_irr_str = f"{const_res.irr*100:.2f}%" if (const_res and const_res.irr is not None) else "N/A"
-    print(f"  Today ${price:,.2f}: MOS = {(1-price/base_fv)*100:.1f}% | Constant-Multiple IRR = {cm_irr_str} | "
-          f"R/R = {rr:.2f}:1 -> Single-Stock Tier: {current_tier}")
+    print("\n[6] v4 SINGLE-STOCK ENTRY CEILINGS — Ceiling = min(Lens A: MOS vs Base DCF, Lens C: Risk/Reward vs Bear)")
+    print("    + HURDLE GATE: Constant-Multiple 5Y IRR at TODAY's price must be >= tier minimum (not a price ceiling)")
+    summ = build_summary(d)
+    ea = assess_entry(d, fs)
+    print(f"  Base FV ${ea.base_fv:,.2f} | Bear FV ${ea.bear_fv:,.2f} ({summ['bear_terminal']}) | Today ${price:,.2f}: "
+          f"MOS {ea.mos_today*100:.1f}% | R/R {ea.rr_today:.2f}:1 | Const-Mult 5Y IRR "
+          + (f"{ea.irr_today*100:.2f}%" if ea.irr_today is not None else f"N/A ({ea.irr_status})"))
+    print(f"  {'Tier':<10} | {'MOS/RR/IRR rule':<16} | {'Lens A':>9} | {'Lens C':>9} | {'Binds':>5} | {'IRR gate':>8} | {'Rounded ceiling (Base g ±1pp)':<34}")
+    print("  " + "-" * 104)
+    for t, ts in zip(ea.tiers, summ["tiers"]):
+        rule_txt = f"{t.min_mos*100:.0f}%/{t.min_rr:.0f}:1/{t.min_irr*100:.0f}%"
+        print(f"  {t.tier:<10} | {rule_txt:<16} | ${t.lens_a_mos:>8,.2f} | ${t.lens_c_rr:>8,.2f} | {t.binder:>5} | "
+              f"{('PASS' if t.irr_gate_ok else 'FAIL'):>8} | ~${ts['central']:,.0f} (range ${ts['range_low']:,.0f}-${ts['range_high']:,.0f})")
+    print(f"  -> Single-Stock Tier Today: {summ['tier_today']} ({summ['tier_reason']})")
+    print("\n  [6b] SENSITIVITY — Base-case UFCF growth (Y1-10) and IRR-model FCF growth shifted together")
+    names = [t.tier for t in ea.tiers]
+    print(f"  {'Δg':>6} | {'Base FV':>8} | {'5Y IRR':>7} | {'R/R':>5} | " + " | ".join(f"{n:>9}" for n in names) + " | Tier today")
+    print("  " + "-" * (46 + 12 * len(names)))
+    for r in summ["sensitivity"]:
+        irr_s = f"{r['irr_today_pct']:>6.1f}%" if r["irr_today_pct"] is not None else "    N/A"
+        rr_s = f"{r['rr_today']:>5.2f}" if r["rr_today"] is not None else "  inf"
+        print(f"  {r['growth_delta_pp']:>+5.0f}pp | ${r['base_fv']:>7,.0f} | {irr_s} | {rr_s} | "
+              + " | ".join(f"${r['ceilings'][n]:>8,.0f}" for n in names) + f" | {r['tier_today']}")
+    if summ["facts_unverified"] or summ["facts_partially_verified"]:
+        print(f"  [PROVENANCE] Unverified facts: {', '.join(summ['facts_unverified']) or '-'}")
+        print(f"               Partially verified: {', '.join(summ['facts_partially_verified']) or '-'}")
     print("  [PORTFOLIO GATE] Single-stock ceilings DO NOT assign portfolio %. Before sizing, verify Module 05 SSOT:")
     print("                   (1) Cash % & Best Alternative IRR, (2) Correlated Basket Cap, (3) Joint Drawdown Stress, (4) ADV Liquidity.")
     print("=" * 100)
@@ -869,9 +1261,136 @@ def run_self_tests() -> None:
 
     print("ALL 9 ADVERSARIAL ACCEPTANCE TESTS PASSED.")
 
+    run_v4_self_tests()
+
+
+def run_v4_self_tests() -> None:
+    print("Running v4 acceptance tests (JSON provenance, per-scenario terminal, 2-lens ceilings, IRR gate, sensitivity)...")
+    n = 0
+
+    # V4-1: Every committed inputs/*.json validates, and BKNG loads into the legacy engine dict.
+    inputs_dir = os.path.join(_repo_root(), "inputs")
+    files = sorted(f for f in os.listdir(inputs_dir) if f.endswith(".json")) if os.path.isdir(inputs_dir) else []
+    assert "BKNG.json" in files, f"inputs/BKNG.json missing (found {files})"
+    for fname in files:
+        with open(os.path.join(inputs_dir, fname), encoding="utf-8") as fh:
+            errs = validate_company_json(json.load(fh))
+        assert not errs, (fname, errs)
+    bk_path = os.path.join(inputs_dir, "BKNG.json")
+    d_bk = load_company_json(bk_path)
+    assert d_bk["ticker"] == "BKNG" and all(isinstance(d_bk[k], float) for k in FACT_FIELDS)
+    n += 1
+
+    # V4-2: Provenance contract — a fact without source, or an assumption without rationale, is rejected.
+    with open(bk_path, encoding="utf-8") as fh:
+        raw = json.load(fh)
+    bad = deepcopy(raw)
+    bad["facts"]["ttm_ocf"]["source_url"] = ""
+    bad["facts"]["ttm_ocf"]["filing_ref"] = ""
+    assert any(e.startswith("facts.ttm_ocf") for e in validate_company_json(bad))
+    bad2 = deepcopy(raw)
+    bad2["assumptions"]["wacc"]["rationale"] = " "
+    assert any(e.startswith("assumptions.wacc") for e in validate_company_json(bad2))
+    bad3 = deepcopy(raw)
+    bad3["facts"]["share_price"]["verification"] = "trust_me"
+    assert any(e.startswith("facts.share_price") for e in validate_company_json(bad3))
+    try:
+        company_dict_from_json(bad)
+        raise AssertionError("invalid file must raise")
+    except ValueError:
+        pass
+    n += 1
+
+    # V4-3: Per-scenario terminal value — 0% terminal growth < 2.5%; exit multiple matches hand calculation;
+    #       legacy call signature (no exit multiple) is unchanged.
+    ev_25 = dcf_enterprise_value(100.0, 0.0, 0.0, 0.10, 0.025)
+    ev_00 = dcf_enterprise_value(100.0, 0.0, 0.0, 0.10, 0.0)
+    manual = sum(100.0 / 1.1 ** t for t in range(1, 11)) + 800.0 / 1.1 ** 10
+    assert ev_00 < ev_25
+    assert abs(dcf_enterprise_value(100.0, 0.0, 0.0, 0.10, 0.025, exit_multiple=8.0) - manual) < 1e-6
+    assert abs(ev_25 - (sum(100.0 / 1.1 ** t for t in range(1, 11)) + 100.0 * 1.025 / 0.075 / 1.1 ** 10)) < 1e-6
+    fs_fx = compute_forensic_metrics(COMPANY_DATA)
+    d_t = deepcopy(COMPANY_DATA)
+    bear_name, _ = _find_scenario(d_t, "Bear")
+    fv_global = scenario_fair_value(d_t, fs_fx, d_t["dcf_scenarios"][bear_name])
+    d_t["dcf_scenarios"][bear_name]["terminal_growth"] = 0.0
+    fv_zero = scenario_fair_value(d_t, fs_fx, d_t["dcf_scenarios"][bear_name])
+    assert abs(fv_global - 108.89) < 0.01 and fv_zero < fv_global - 10.0, (fv_global, fv_zero)
+    n += 1
+
+    # V4-4: Ceilings = min(Lens A, Lens C) only, and do NOT move when the IRR-model growth changes (Lens B removed).
+    a0 = assess_entry(COMPANY_DATA, fs_fx)
+    for t in a0.tiers:
+        p_a = a0.base_fv * (1.0 - t.min_mos)
+        p_c = (a0.base_fv + t.min_rr * a0.bear_fv) / (1.0 + t.min_rr)
+        assert abs(t.ceiling - min(p_a, p_c)) < 1e-9
+    d_g = deepcopy(COMPANY_DATA)
+    d_g["irr_model"]["base_clean_fcf_growth"] = 0.02
+    a_g = assess_entry(d_g, fs_fx)
+    assert all(abs(x.ceiling - y.ceiling) < 1e-9 for x, y in zip(a0.tiers, a_g.tiers))
+    # Regression vs v3 fixture: Starter/Core unchanged (R/R-bound); Fat Pitch now MOS-bound $124.90 (was Lens B $119.13)
+    assert abs(a0.tiers[0].ceiling - 136.64) < 0.01 and abs(a0.tiers[1].ceiling - 129.70) < 0.01
+    assert abs(a0.tiers[2].ceiling - 124.90) < 0.01 and a0.tiers[2].binder == "MOS"
+    assert a0.tier_today is None and not a0.tiers[0].price_ok  # $146 > Starter ceiling -> Watchlist
+    n += 1
+
+    # V4-5: IRR hurdle gate — a cheap price passes every ceiling, but a shrinking business fails the 11% gate.
+    d_c = deepcopy(COMPANY_DATA)
+    d_c["share_price"] = 100.0
+    a_c = assess_entry(d_c, compute_forensic_metrics(d_c))
+    assert all(t.price_ok for t in a_c.tiers) and a_c.tier_today == "Fat Pitch", a_c
+    d_s = deepcopy(d_c)
+    d_s["irr_model"]["base_clean_fcf_growth"] = -0.10
+    a_s = assess_entry(d_s, compute_forensic_metrics(d_s))
+    assert a_s.irr_today is not None and a_s.irr_today < 0.11
+    assert all(t.price_ok and not t.irr_gate_ok for t in a_s.tiers) and a_s.tier_today is None, a_s
+    n += 1
+
+    # V4-6: Sensitivity is monotonic in growth and published ranges bracket the central ceiling.
+    s_bk = build_summary(d_bk)
+    rows = sorted(s_bk["sensitivity"], key=lambda r: r["growth_delta_pp"])
+    for tier in [t["tier"] for t in s_bk["tiers"]]:
+        vals = [r["ceilings"][tier] for r in rows]
+        assert all(a <= b for a, b in zip(vals, vals[1:])), (tier, vals)
+    for t in s_bk["tiers"]:
+        assert t["range_low"] <= t["central"] <= t["range_high"], t
+        assert abs(t["central"] / s_bk["rounding_step"] - round(t["central"] / s_bk["rounding_step"])) < 1e-9
+    assert price_step(146.0) == 5.0 and round_to_step(136.64, 5.0) == 135.0 and price_step(42.0) == 1.0
+    n += 1
+
+    # V4-7: Generated markdown is deterministic (required for the CI drift check).
+    assert render_summary_block(build_summary(d_bk)) == render_summary_block(build_summary(load_company_json(bk_path)))
+    n += 1
+
+    print(f"ALL {n} V4 ACCEPTANCE TESTS PASSED.")
+
+
+def _arg_value(argv: List[str], flag: str) -> Optional[str]:
+    if flag in argv:
+        i = argv.index(flag)
+        if i + 1 < len(argv):
+            return argv[i + 1]
+        raise SystemExit(f"{flag} needs a value")
+    return None
+
+
+def main(argv: List[str]) -> int:
+    if "--self-test" in argv:
+        run_self_tests()
+        return 0
+    path = _arg_value(argv, "--input")
+    d = load_company_json(path) if path else COMPANY_DATA
+    if "--summary-json" in argv:
+        print(json.dumps(build_summary(d), ensure_ascii=False, indent=2))
+        return 0
+    if "--summary-md" in argv:
+        print(render_summary_block(build_summary(d)))
+        return 0
+    if not path:
+        print("[LEGACY v3 FIXTURE] Regression example only — run with `--input inputs/BKNG.json` for the audited v4 view.")
+    run_valuation_report(d)
+    return 0
+
 
 if __name__ == "__main__":
-    if "--self-test" in sys.argv:
-        run_self_tests()
-    else:
-        run_valuation_report(COMPANY_DATA)
+    sys.exit(main(sys.argv[1:]))

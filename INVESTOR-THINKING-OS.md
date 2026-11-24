@@ -90,18 +90,10 @@
 
 ### เฟส 6: กฎการจัดพอร์ตและการขาย (Position Sizing, Correlation Cap & Sell Discipline)
 
-* **Position Sizing:**
-  * **Watchlist (0%):** ธุรกิจดีแต่ราคา = Fair Value หรือยังขาด Margin of Safety
-  * **Small Starter (2%–3%):** ราคาถูกกว่ามูลค่ามาก (Mispricing ชัด) แต่มี Tail Risk/ความไม่แน่นอนเชิงโครงสร้างสูง
-  * **Starter–Core (4%–8%):** คูเมืองชัด งบแกร่ง Downside จำกัด และ Base IRR ≥ 13%–15%
-  * **High-Conviction Concentrated (10%–15%):** ใช้เฉพาะธุรกิจกึ่งผูกขาดที่เข้าใจทะลุปรุโปร่งและราคาตกจากปัจจัยชั่วคราวเท่านั้น
+* **Position Sizing:** ตัวเลข % พอร์ตทั้งหมดยึด **[โมดูล 05 §2](./os-modules/05-PORTFOLIO-SIZING-RISK-SELL-DISCIPLINE.md)** เพียงแห่งเดียว (v4 — ไฟล์นี้ไม่เขียนตัวเลขซ้ำ) และ `Watchlist` = 0% เสมอ
 * **Correlation Cap (กฎห้ามซ้อนความเสี่ยงเดียวกัน):**
   * ห้ามถือหุ้นหลายตัวที่พึ่งพาความเสี่ยงแกนเดียวกันเกินโควตารวม (เช่น ถือหุ้น OTA 2 ตัว หรือหุ้น AI Semi 2 ตัว → ต้องนับเป็นตะกร้าเดียวกันจำกัดรวม **≤ 10%–12% ของพอร์ต**)
-* **Sell Discipline (กฎขาย 4 ข้อ — ห้ามขายแค่เพราะหุ้นขึ้นหรือกลัวข่าวสั้น):**
-  1. **Thesis Broken / Moat Eroding:** เข้าเงื่อนไข Thesis Breakers ที่เขียนไว้ล่วงหน้า
-  2. **Governance / Capital Allocation Breakdown:** ผู้บริหารก่อหนี้ทำลายมูลค่า โกหก หรือเปลี่ยนโมเดลจาก Asset-Light เป็น Asset-Heavy แบบไร้เหตุผล
-  3. **Extreme Valuation Absurdity:** Reverse DCF สะท้อนการเติบโตที่เป็นไปไม่ได้ในทางสถิติ (Expected Future IRR ต่ำกว่าพันธบัตรรัฐบาล)
-  4. **Superior Opportunity Cost:** พบหุ้นอื่นที่คุณภาพเท่ากันหรือดีกว่า แต่ให้ IRR และ Margin of Safety สูงกว่าอย่างชัดเจน
+* **Sell Discipline:** กฎขายแบบ 2 ขั้น (Trim Zone ทยอยลด 25%–50% / Full Exit) อยู่ที่ **[โมดูล 05 §5](./os-modules/05-PORTFOLIO-SIZING-RISK-SELL-DISCIPLINE.md)** เพียงแห่งเดียว
 
 ---
 

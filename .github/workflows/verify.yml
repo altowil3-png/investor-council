@@ -1,0 +1,39 @@
+name: Investor Council Verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify-engine-and-modules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify core OS module files exist
+        run: |
+          for f in \
+            os-modules/00-START-HERE-SYSTEM-PROMPT.md \
+            os-modules/01-FORENSIC-ACCOUNTING-MANUAL.md \
+            os-modules/02-GRASSROOTS-SCUTTLEBUTT-FIELD-GUIDE.md \
+            os-modules/03-VALUATION-DCF-IRR-TEMPLATES.md \
+            os-modules/04-SPLIT-BRAIN-DEBATE-PROMPTS.md \
+            os-modules/05-PORTFOLIO-SIZING-RISK-SELL-DISCIPLINE.md \
+            os-modules/valuation_engine.py; do
+            test -s "$f" || { echo "Missing or empty: $f"; exit 1; }
+          done
+          echo "All 7 core OS module files present."
+
+      - name: Run adversarial valuation self-test suite
+        run: python3 os-modules/valuation_engine.py --self-test
+
+      - name: Run default valuation report smoke test
+        run: python3 os-modules/valuation_engine.py > /dev/null && echo "Default report OK"

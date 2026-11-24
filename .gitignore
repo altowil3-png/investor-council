@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+
+__pycache__/
+*.py[cod]

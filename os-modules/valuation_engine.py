@@ -972,6 +972,17 @@ def build_summary(d: Dict[str, object]) -> Dict[str, object]:
 
     implied = solve_reverse_dcf_ufcf_cagr(fs.float_adjusted_ev, fs.unlevered_fcf_pl, float(d["wacc"]), float(d["terminal_growth"]))
     prov = d.get("_provenance", {})
+    scenarios = []
+    for name, cfg in d["dcf_scenarios"].items():
+        fv = scenario_fair_value(d, fs, cfg)
+        scenarios.append({
+            "name": name,
+            "g_1_5_pct": round(float(cfg["ufcf_cagr_1_5"]) * 100, 1),
+            "g_6_10_pct": round(float(cfg["ufcf_cagr_6_10"]) * 100, 1),
+            "terminal": scenario_terminal_label(d, cfg),
+            "fair_value": round_to_step(fv, step),
+            "vs_price_pct": round((fv / central.price - 1.0) * 100, 0),
+        })
     return {
         "schema_version": SCHEMA_VERSION,
         "ticker": d["ticker"],
@@ -988,6 +999,9 @@ def build_summary(d: Dict[str, object]) -> Dict[str, object]:
         "irr_today_pct": round(central.irr_today * 100, 1) if central.irr_today is not None else None,
         "implied_ufcf_cagr_pct": round(implied * 100, 1) if implied is not None else None,
         "clean_fcf_yield_pct": round(fs.clean_fcf_yield_mcap * 100, 2),
+        "risk_free_pct": round(float(d.get("risk_free_yield", 0.0)) * 100, 2),
+        "wacc_pct": round(float(d["wacc"]) * 100, 2),
+        "scenarios": scenarios,
         "tier_today": central.tier_today or "Watchlist",
         "tier_reason": central.reason,
         "tiers": tiers_out,
@@ -1019,11 +1033,19 @@ def render_summary_block(s: Dict[str, object]) -> str:
     L.append(f"| มูลค่ากรณีฐาน / กรณีหมี | ~{_fmt_money(s['base_fv'])} / ~{_fmt_money(s['bear_fv'])} (กรณีหมีใช้ {s['bear_terminal']}) |")
     L.append(f"| ส่วนเผื่อความปลอดภัยวันนี้ / อัตราได้ต่อเสีย | {s['mos_today_pct']}% / {s['rr_today']} : 1 |")
     L.append(f"| ผลตอบแทน 5 ปี ณ ราคาวันนี้ (ตัวคูณคงที่ — ใช้เป็นด่านขั้นต่ำ ไม่ใช่เพดานราคา) | {s['irr_today_pct']}% |")
-    L.append(f"| ตลาดคาด UFCF โตปีละ (reverse DCF) | {s['implied_ufcf_cagr_pct']}% |")
+    L.append(f"| ตลาดคาด UFCF โตปีละ (reverse DCF ที่ WACC {s['wacc_pct']}%) | {s['implied_ufcf_cagr_pct']}% |")
+    L.append(f"| Clean FCF yield เทียบพันธบัตร 10 ปี | {s['clean_fcf_yield_pct']}% เทียบ {s['risk_free_pct']}% |")
     for t in s["tiers"]:
         r = t["rule"]
         gate = "ผ่าน" if t["irr_gate_ok_today"] else "ไม่ผ่าน"
         L.append(f"| เพดาน {t['tier']} (MOS ≥{r['min_mos']*100:.0f}%, ได้ต่อเสีย ≥{r['min_rr']:.0f}:1; ด่าน IRR ≥{r['min_irr']*100:.0f}% ณ ราคาวันนี้: {gate}) | {_range_txt(t)} — ผูกมัดโดย {t['binder']} |")
+    L.append("")
+    L.append("มูลค่าตาม scenario:")
+    L.append("")
+    L.append("| Scenario | โตปี 1–5 | โตปี 6–10 | มูลค่าปลายทาง | มูลค่าต่อหุ้น | เทียบราคา |")
+    L.append("| :--- | :---: | :---: | :---: | :---: | :---: |")
+    for sc in s["scenarios"]:
+        L.append(f"| {sc['name']} | {sc['g_1_5_pct']}% | {sc['g_6_10_pct']}% | {sc['terminal']} | ~{_fmt_money(sc['fair_value'])} | {sc['vs_price_pct']:+.0f}% |")
     L.append("")
     L.append("ตารางความอ่อนไหว (เลื่อนอัตราโต FCF กรณีฐานทั้ง 10 ปี):")
     L.append("")

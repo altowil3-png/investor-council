@@ -29,6 +29,7 @@
 <!-- AUTO-SUMMARY:README:START -->
 * [BKNG — Booking Holdings Inc.](./analyses/us/BKNG-booking-holdings.md) *(v4 ณ 2026-11-23 ที่ $146 — สถานะ: **Watchlist**; เพดาน Starter ~$120 (ช่วง $115–$125); ผลตอบแทน 5 ปี 13.3%)*
 * [MDT — Medtronic plc](./analyses/us/MDT-medtronic.md) *(v4 ณ 2026-11-24 ที่ $96.68 — สถานะ: **Watchlist**; เพดาน Starter ~$53 (ช่วง $50–$55); ผลตอบแทน 5 ปี 10.2%)*
+* [RMD — ResMed Inc.](./analyses/us/RMD-resmed.md) *(v4 ณ 2026-11-20 ที่ $235.63 — สถานะ: **Watchlist**; เพดาน Starter ~$165 (ช่วง $160–$170); ผลตอบแทน 5 ปี 10.4%)*
 * [ZTS — Zoetis Inc.](./analyses/us/ZTS-zoetis.md) *(v4 ณ 2026-11-24 ที่ $83.82 — สถานะ: **Watchlist**; เพดาน Starter ~$54 (ช่วง $52–$56); ผลตอบแทน 5 ปี 7.7%)*
 <!-- AUTO-SUMMARY:README:END -->
 

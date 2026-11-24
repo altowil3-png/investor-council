@@ -1,0 +1,290 @@
+{
+  "schema_version": "4.0",
+  "ticker": "MDT",
+  "company_name": "Medtronic plc",
+  "as_of_date": "2026-11-24",
+  "currency": "USD",
+  "analysis_path": "analyses/us/MDT-medtronic.md",
+  "_units": "เงินทุกตัวหน่วย $ ล้าน ยกเว้นราคาหุ้นและปันผลต่อหุ้น; ตัวเลข 12 เดือนเป็นฐานหลังแยก MiniMed (pro forma) ตามที่ระบุในแต่ละรายการ",
+  "_verification_levels": {
+    "verified": "เทียบตรงกับเอกสารของบริษัทแล้ว",
+    "partially_verified": "ส่วนประกอบหลักตรวจแล้ว แต่มีการคำนวณ/ปรับฐานหลังแยก MiniMed โดยนักวิเคราะห์",
+    "carried_over_unverified": "ประมาณการที่ยังไม่ได้เทียบเอกสารยื่นทางการ"
+  },
+  "facts": {
+    "share_price": {
+      "value": 96.68,
+      "unit": "USD/share",
+      "as_of_date": "2026-11-24",
+      "source_url": "https://www.investing.com/news/transcripts/earnings-call-transcript-medtronic-posts-q2-2026-eps-beat-shares-fall-premarket-93CH-5048350",
+      "filing_ref": "ราคาก่อนตลาดเปิด 24 พ.ย. 2026 หลังประกาศงบ: $96.68 (−4.0% จากปิดก่อนหน้า $100.72)",
+      "verification": "partially_verified",
+      "note": "ราคาก่อนตลาดเปิด — ต้องอัปเดตเป็นราคาปิดวันนี้ก่อนใช้ตัดสินใจ"
+    },
+    "diluted_shares_m": {
+      "value": 1230.0,
+      "unit": "million shares",
+      "as_of_date": "2026-11-24",
+      "source_url": "https://news.medtronic.com/2026-10-14-Medtronic-Announces-Final-Results-of-MiniMed-Group,-Inc-Exchange-Offer",
+      "filing_ref": "หุ้นคงค้าง ~1,280M ก่อนแลกหุ้น − 55,032,401 หุ้นที่ถูกแลกออกในดีล MiniMed (15 ต.ค. 2026) + ผลเจือจาง ~5M; หุ้นเจือจางเฉลี่ย Q2 = 1,271.3M (นับก่อนแลกบางส่วน)",
+      "verification": "partially_verified",
+      "note": "บริษัทบอกว่า FY27 นับลดลง 31M และ FY28 ลดเต็ม 55M"
+    },
+    "risk_free_yield": {
+      "value": 0.0505,
+      "unit": "rate",
+      "as_of_date": "2026-11-19",
+      "source_url": "https://www.morningstar.com/news/dow-jones/202611198503/10-year-treasury-yield-falls-to-5051-data-talk",
+      "filing_ref": "Dow Jones Data Talk: US 10Y 5.051%",
+      "verification": "verified",
+      "note": ""
+    },
+    "total_debt": {
+      "value": 29130.0,
+      "unit": "USD m",
+      "as_of_date": "2026-10-30",
+      "source_url": "https://news.medtronic.com/2026-11-24-Medtronic-reports-second-quarter-fiscal-2027-results-performance-reflects-consistent-execution-across-the-portfolio",
+      "filing_ref": "หนี้รวมสิ้นปีบัญชี FY26 ~$27.96B + หนี้ระยะสั้นสุทธิเพิ่ม $471M ใน 6 เดือน (งบกระแสเงินสด Q2) + หนี้สัญญาเช่าประมาณ ~$0.7B",
+      "verification": "partially_verified",
+      "note": "ยอดหนี้ FY26 มาจากแหล่งรวบรวมข้อมูล; หนี้สัญญาเช่าเป็นตัวประมาณ; ยังไม่มี 10-Q Q2"
+    },
+    "total_cash_and_st_inv": {
+      "value": 7990.0,
+      "unit": "USD m",
+      "as_of_date": "2026-10-30",
+      "source_url": "https://news.medtronic.com/2026-11-24-Medtronic-reports-second-quarter-fiscal-2027-results-performance-reflects-consistent-execution-across-the-portfolio",
+      "filing_ref": "เงินสด $866M ณ 30 ต.ค. 2026 (งบ Q2) + เงินลงทุนระยะสั้น ~$7.1B (งบดุล Q1 FY27); สิ้น FY26 เงินสดและเงินลงทุนรวม $9.2B",
+      "verification": "partially_verified",
+      "note": "ไม่รวมเงินลงทุนระยะยาว/ตราสารทุนเชิงกลยุทธ์ ~$0.9B"
+    },
+    "customer_float_liability": {
+      "value": 0.0,
+      "unit": "USD m",
+      "as_of_date": "2026-10-30",
+      "source_url": "https://news.medtronic.com/2026-11-24-Medtronic-reports-second-quarter-fiscal-2027-results-performance-reflects-consistent-execution-across-the-portfolio",
+      "filing_ref": "ไม่มีเงินลูกค้าพักไว้แบบแพลตฟอร์ม (ธุรกิจขายอุปกรณ์การแพทย์)",
+      "verification": "verified",
+      "note": "ภาระคดีความที่ตั้งไว้ไม่ได้แยกเปิดเผยในงบ Q2 — ใส่ไว้ใน pv_cash_drag แทน"
+    },
+    "minority_interest": {
+      "value": 180.0,
+      "unit": "USD m",
+      "as_of_date": "2026-10-30",
+      "source_url": "",
+      "filing_ref": "ส่วนได้เสียที่ไม่มีอำนาจควบคุม (ประมาณจากงบก่อนหน้า; ส่วนของ MiniMed หมดไปแล้ว)",
+      "verification": "carried_over_unverified",
+      "note": ""
+    },
+    "ttm_revenue": {
+      "value": 35300.0,
+      "unit": "USD m",
+      "as_of_date": "2026-10-30",
+      "source_url": "https://news.medtronic.com/2026-11-24-Medtronic-reports-second-quarter-fiscal-2027-results-performance-reflects-consistent-execution-across-the-portfolio",
+      "filing_ref": "ฐานหลังแยก MiniMed: FY26 $36.364B − diabetes $3.102B + การเติบโตขององค์กรที่เหลือ; ไม่รวมสัปดาห์ที่ 53 (~$570M)",
+      "verification": "partially_verified",
+      "note": "ตัวเลขปรับฐานโดยนักวิเคราะห์"
+    },
+    "ttm_core_gaap_ebit": {
+      "value": 8400.0,
+      "unit": "USD m",
+      "as_of_date": "2026-10-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001613103/000162828026040034/exhibit991-fy26q4earningsr.htm",
+      "filing_ref": "กำไรจากการดำเนินงาน non-GAAP FY26 $8.856B (รวม diabetes); FY27 คาด op margin +80–90bp (ครึ่งหนึ่งจากการแยก MiniMed); หักค่าปรับโครงสร้าง/คดีที่เกิดทุกปี ~$0.5B",
+      "verification": "partially_verified",
+      "note": "ตั้งใจไม่ใช้ non-GAAP ตรง ๆ เพราะ 'ค่าใช้จ่ายครั้งเดียว' ของ MDT เกิดทุกปี (6 เดือน FY27: ปรับโครงสร้าง $160M, คดี $33M)"
+    },
+    "ttm_depreciation_amort": {
+      "value": 1200.0,
+      "unit": "USD m",
+      "as_of_date": "2026-10-30",
+      "source_url": "",
+      "filing_ref": "ค่าเสื่อมราคาไม่รวมค่าตัดจำหน่ายสินทรัพย์จากการซื้อกิจการ (ประมาณ)",
+      "verification": "carried_over_unverified",
+      "note": ""
+    },
+    "ttm_capex": {
+      "value": 1820.0,
+      "unit": "USD m",
+      "as_of_date": "2026-10-30",
+      "source_url": "https://news.medtronic.com/2026-11-24-Medtronic-reports-second-quarter-fiscal-2027-results-performance-reflects-consistent-execution-across-the-portfolio",
+      "filing_ref": "CapEx FY26 ~$1.9B (OCF $7.3B − FCF $5.4B) + 6 เดือน FY27 $894M − 6 เดือน FY26 $972M",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_sbc": {
+      "value": 580.0,
+      "unit": "USD m",
+      "as_of_date": "2026-10-30",
+      "source_url": "https://news.medtronic.com/2026-11-24-Medtronic-reports-second-quarter-fiscal-2027-results-performance-reflects-consistent-execution-across-the-portfolio",
+      "filing_ref": "SBC 6 เดือน FY27 $282M (ปีก่อน $268M) → ทั้งปีราว $570–590M",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_ocf": {
+      "value": 8800.0,
+      "unit": "USD m",
+      "as_of_date": "2026-10-30",
+      "source_url": "https://news.medtronic.com/2026-11-24-Medtronic-reports-second-quarter-fiscal-2027-results-performance-reflects-consistent-execution-across-the-portfolio",
+      "filing_ref": "OCF FY26 $7.3B + 6 เดือน FY27 $3,515M − 6 เดือน FY26 $2,013M",
+      "verification": "partially_verified",
+      "note": "OCF 12 เดือนที่รายงานรวม diabetes ถึง 15 ต.ค., สัปดาห์ที่ 53 และจังหวะภาษี/เงินทุนหมุนเวียน — ส่วนที่ไม่ยั่งยืนหักออกใน ttm_float_inflow"
+    },
+    "ttm_net_interest_expense": {
+      "value": 420.0,
+      "unit": "USD m",
+      "as_of_date": "2026-10-30",
+      "source_url": "",
+      "filing_ref": "ดอกเบี้ยจ่าย ~$181M/ไตรมาส (ไตรมาส ธ.ค. 2025) หักดอกเบี้ยรับจากเงินลงทุน ~$7–8B (ประมาณ)",
+      "verification": "carried_over_unverified",
+      "note": ""
+    },
+    "annual_dividend_per_share": {
+      "value": 2.88,
+      "unit": "USD/share",
+      "as_of_date": "2026-06-03",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001613103/000162828026040034/exhibit991-fy26q4earningsr.htm",
+      "filing_ref": "ปันผลรายไตรมาส $0.72 เริ่ม Q1 FY27 = $2.88 ต่อปี (ขึ้นปันผลติดต่อกันปีที่ 49)",
+      "verification": "verified",
+      "note": ""
+    }
+  },
+  "assumptions": {
+    "effective_tax_rate": {
+      "value": 0.185,
+      "rationale": "อัตราภาษี non-GAAP 6 เดือน FY27 = 18.5% (Q2 = 19.9% จากการทบทวนสำรองภาษีที่บริษัทบอกว่าไม่เกิดซ้ำ)"
+    },
+    "ttm_normal_working_capital_investment": {
+      "value": 350.0,
+      "rationale": "สินค้าคงคลังและลูกหนี้โตตามรายได้ ~5–6% ต่อปี"
+    },
+    "ttm_float_inflow": {
+      "value": 1000.0,
+      "rationale": "OCF 12 เดือน $8.8B สูงกว่า FY26 $7.3B ถึง $1.5B; ส่วนที่ไม่ยั่งยืน ~$1.0B = สัปดาห์ที่ 53 + กระแสเงินสดของ diabetes ก่อนแยก + จังหวะภาษี/เงินทุนหมุนเวียน (บริษัทไม่ได้แยกตัวเลขให้ — เป็นการประมาณฝั่งระวัง)"
+    },
+    "float_cash_coverage_ratio": {
+      "value": 1.0,
+      "rationale": "ไม่มีเงินลูกค้าพักไว้ ค่านี้ไม่มีผล"
+    },
+    "wacc": {
+      "value": 0.0905,
+      "rationale": "พันธบัตร 10 ปี 5.05% + ส่วนชดเชย 4.0% (Tier 2 ปลายล่าง — ธุรกิจคาดการณ์ได้ beta ~0.55 แต่มีความเสี่ยงการแข่งขัน PFA และนโยบายราคาจีน)"
+    },
+    "terminal_growth": {
+      "value": 0.025,
+      "rationale": "ฐานตามตาราง Tier 2 และประวัติ MDT ที่โตช้า"
+    },
+    "assumed_incremental_roic": {
+      "value": 0.15,
+      "rationale": "ใช้ตรวจความสมเหตุสมผลของการลงทุนซ้ำ — MDT มี goodwill สูง ROIC รวมจึงต่ำกว่า ROIC ส่วนเพิ่ม"
+    },
+    "operating_leverage_factor": {
+      "value": 1.0,
+      "rationale": "สมมติ FCF โตเท่ารายได้ในตาราง Required Growth"
+    }
+  },
+  "reverse_dcf_cases": [
+    {
+      "label": "Flat margin, no extra charge",
+      "margin_change_5y": 0.0,
+      "fine_m": 0.0,
+      "fine_year": 2
+    },
+    {
+      "label": "+100 bps margin (target path)",
+      "margin_change_5y": 0.01,
+      "fine_m": 0.0,
+      "fine_year": 2
+    },
+    {
+      "label": "-100 bps margin, tariffs/VBP $0.5B",
+      "margin_change_5y": -0.01,
+      "fine_m": 500.0,
+      "fine_year": 2
+    },
+    {
+      "label": "-200 bps margin, litigation $1.0B",
+      "margin_change_5y": -0.02,
+      "fine_m": 1000.0,
+      "fine_year": 2
+    }
+  ],
+  "dcf_scenarios": {
+    "Bear (PFA Share Loss + Stagnation)": {
+      "ufcf_cagr_1_5": 0.0,
+      "ufcf_cagr_6_10": 0.015,
+      "pv_cash_drag": 2500.0,
+      "terminal_growth": 0.015,
+      "driver_note": "คู่แข่ง dual-energy ตีกลับส่วนแบ่ง PFA, RDN/Hugo ไม่เกิด, นโยบายจัดซื้อรวมของจีน, ภาษีนำเข้า → กลับไปเป็น MDT ยุค 2016–2024 ที่ FCF แทบไม่โต; โตตลอดไปแค่ 1.5%"
+    },
+    "Conservative (Mid-Single-Digit Grind)": {
+      "ufcf_cagr_1_5": 0.035,
+      "ufcf_cagr_6_10": 0.03,
+      "pv_cash_drag": 1500.0,
+      "driver_note": "รายได้โต ~4–5%, margin ทรง, การลงทุน Hugo/RDN กินกำไร"
+    },
+    "Base (Post-MiniMed Execution)": {
+      "ufcf_cagr_1_5": 0.065,
+      "ufcf_cagr_6_10": 0.045,
+      "pv_cash_drag": 1000.0,
+      "driver_note": "รายได้โต ~5.5–6% + margin ขยาย ~40–60bp ต่อปี; PFA โตเกินตลาด, CST/ACM ดี, Neuromod อ่อน"
+    },
+    "Bull (Growth Platforms Deliver)": {
+      "ufcf_cagr_1_5": 0.09,
+      "ufcf_cagr_6_10": 0.06,
+      "pv_cash_drag": 500.0,
+      "driver_note": "PFA + Sphere-360 ครองตลาด, RDN เร่งหลัง CPT Category I (ม.ค. 2028), Hugo ได้ที่ยืน, gross margin กลับสู่ระดับก่อนโควิด"
+    }
+  },
+  "irr_model": {
+    "base_clean_fcf_growth": 0.065,
+    "dividend_growth_rate": 0.02,
+    "fcf_allocation_to_buybacks": 0.5,
+    "annual_cash_drag_m": 150.0,
+    "dividend_funding_policy": "strict_fail",
+    "after_tax_debt_cost": 0.04,
+    "exit_multiple_scenarios": {
+      "De-rating (-15% Multiple)": 0.85,
+      "Constant-Multiple Case (1.00x)": 1.0,
+      "Mild Re-rating (+15% Multiple)": 1.15
+    }
+  },
+  "entry_zone_rules": [
+    {
+      "tier": "Starter",
+      "min_mos": 0.15,
+      "min_const_mult_irr": 0.11,
+      "min_rr": 2.0
+    },
+    {
+      "tier": "Core",
+      "min_mos": 0.25,
+      "min_const_mult_irr": 0.13,
+      "min_rr": 3.0
+    },
+    {
+      "tier": "Fat Pitch",
+      "min_mos": 0.35,
+      "min_const_mult_irr": 0.15,
+      "min_rr": 4.0
+    }
+  ],
+  "sensitivity_growth_deltas": [
+    -0.02,
+    -0.01,
+    0.0,
+    0.01,
+    0.02
+  ],
+  "audit_log": [
+    {
+      "date": "2026-11-24",
+      "by": "AGV (Antigravity)",
+      "change": "v1 legacy — ก่อนงบ Q2 FY27, ไม่มี JSON"
+    },
+    {
+      "date": "2026-11-24",
+      "by": "Claude (full v4 audit)",
+      "change": "สร้าง JSON ครั้งแรกหลังงบ Q2 FY27; ฐานหลังแยก MiniMed; OCF ไม่ยั่งยืน $1.0B หักออก; core EBIT หักค่าใช้จ่ายที่ 'ไม่เกิดซ้ำ' แต่เกิดทุกปี"
+    }
+  ]
+}

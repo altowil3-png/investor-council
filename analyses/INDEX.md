@@ -12,6 +12,7 @@
 | Ticker | บริษัท | ราคา ณ วันที่ | สถานะ v4 | เพดาน Starter | เพดาน Core | ไฟล์ |
 | :--- | :--- | :---: | :--- | :---: | :---: | :--- |
 | **BKNG** | Booking Holdings Inc. | $146 (2026-11-23) | **Watchlist** | ~$120 (ช่วง $115–$125) | ~$110 (ช่วง $110–$115) | [BKNG-booking-holdings.md](./us/BKNG-booking-holdings.md) |
+| **MDT** | Medtronic plc | $96.68 (2026-11-24) | **Watchlist** | ~$53 (ช่วง $50–$55) | ~$50 (ช่วง $48–$52) | [MDT-medtronic.md](./us/MDT-medtronic.md) |
 <!-- AUTO-SUMMARY:INDEX:END -->
 
 แก้ตัวเลขที่ `inputs/TICKER.json` แล้วรัน `python3 tools/sync_summaries.py --write`
@@ -29,5 +30,5 @@
 | **UBER** | Uber Technologies, Inc. | ~$64.07 | Small Starter (2%–3%) $60–$64 / Core ≤ $55–$58 / Fat Pitch ≤ $48–$50 | 23 พ.ย. 2026 | [UBER-uber-technologies.md](./us/UBER-uber-technologies.md) `[LEGACY v1 — Pending v4 Re-audit]` |
 | **GOOGL** | Alphabet Inc. | ~$283.93 | Watchlist — Starter ≤ $255–$260 / Core ≤ $230–$245 | 23 พ.ย. 2026 | [GOOGL-alphabet.md](./us/GOOGL-alphabet.md) `[LEGACY v1 — Pending v4 Re-audit]` |
 | **POOL** | Pool Corporation | ~$208.23 | Watchlist — Starter ≤ $180–$188 / Core ≤ $155–$170 | 23 พ.ย. 2026 | [POOL-pool-corp.md](./us/POOL-pool-corp.md) `[LEGACY v1 — Pending v4 Re-audit]` |
-| **MDT** | Medtronic plc | ~$100–$103 | Watchlist — ≤ $78–$82 หรือรอพิสูจน์ True FCF $6.5B–$7B+ | 24 พ.ย. 2026 | [MDT-medtronic.md](./us/MDT-medtronic.md) `[LEGACY v1 — Pending v4 Re-audit]` |
+| **MDT (v1)** | Medtronic plc — ฉบับ AGV เก็บไว้เทียบ (เขียนก่อนงบ Q2 FY27) | ~$100–$103 | Watchlist — ≤ $78–$82 — ⚠️ ถูกแทนที่ด้วยฉบับ v4 ในตารางแรก | 24 พ.ย. 2026 | [MDT-medtronic-v1-agv.md](./us/MDT-medtronic-v1-agv.md) `[LEGACY v1 — Pending v4 Re-audit]` |
 | **BSX** | Boston Scientific Corp. | ~$42 | Pass — หนี้ >3.6x หลังดีล Penumbra $14.5B + หั่นเป้า 3 รอบ (ดูใหม่ ≤ $32–$35) | 23 พ.ย. 2026 | [BSX-boston-scientific.md](./us/BSX-boston-scientific.md) `[LEGACY v1 — Pending v4 Re-audit]` |

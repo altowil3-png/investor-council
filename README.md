@@ -28,6 +28,7 @@
 
 <!-- AUTO-SUMMARY:README:START -->
 * [BKNG — Booking Holdings Inc.](./analyses/us/BKNG-booking-holdings.md) *(v4 ณ 2026-11-23 ที่ $146 — สถานะ: **Watchlist**; เพดาน Starter ~$120 (ช่วง $115–$125); ผลตอบแทน 5 ปี 13.3%)*
+* [MDT — Medtronic plc](./analyses/us/MDT-medtronic.md) *(v4 ณ 2026-11-24 ที่ $96.68 — สถานะ: **Watchlist**; เพดาน Starter ~$53 (ช่วง $50–$55); ผลตอบแทน 5 ปี 10.2%)*
 <!-- AUTO-SUMMARY:README:END -->
 
 **บทวิเคราะห์รุ่นเก่า** — ทำก่อนกฎ v4 ตัวเลขและข้อสรุปยังไม่ผ่านการตรวจ ห้ามใช้ตัดสินใจลงเงินจนกว่าจะรันใหม่ผ่าน `inputs/TICKER.json`:
@@ -37,7 +38,7 @@
 * [GOOGL — Alphabet Inc.](./analyses/us/GOOGL-alphabet.md) `[LEGACY v1 — Pending v4 Re-audit]` *(วิเคราะห์ 23 พ.ย. 2026 — Split-Brain Debate — Verdict: Watchlist / Wait ที่ $284; Starter ≤ $255–$260, Core ≤ $230–$245)*
 * [BKNG (v2) — ฉบับ AGV เก็บไว้เทียบ](./analyses/us/BKNG-booking-holdings-v2-agv.md) `[LEGACY v1 — Pending v4 Re-audit]` *(ข้อสรุปเดิม BUY $137–$148 ถูกแทนที่ด้วยฉบับ v4 ด้านบน)*
 * [SYK — Stryker Corporation](./analyses/us/SYK-stryker.md) `[LEGACY v1 — Pending v4 Re-audit]` *(วิเคราะห์ 23 พ.ย. 2026 — Verdict: Starter Buy / ทยอยสะสม $295–$310, Core ≤ $275–$285 — ชนะ MDT ชัดเจนในตารางเทียบ)* ⚠️ *ข้อสรุปเดิมนี้ขัดกฎ v4 เอง: ผลตอบแทนกรณีฐาน ~10% ต่ำกว่าด่านขั้นต่ำ 11% ของ Starter*
-* [MDT — Medtronic plc](./analyses/us/MDT-medtronic.md) `[LEGACY v1 — Pending v4 Re-audit]` *(วิเคราะห์ 24 พ.ย. 2026 — Verdict: Watchlist / รอราคาโซน ≤ $78–$82 หรือพิสูจน์งบ Q2–Q4 FY27 หลังแยก MiniMed)*
+* [MDT (v1) — ฉบับ AGV เก็บไว้เทียบ](./analyses/us/MDT-medtronic-v1-agv.md) `[LEGACY v1 — Pending v4 Re-audit]` *(ข้อสรุปเดิม Watchlist ≤ $78–$82 เขียนก่อนงบ Q2 FY27 — ถูกแทนที่ด้วยฉบับ v4 ด้านบน)*
 * [BSX — Boston Scientific Corporation](./analyses/us/BSX-boston-scientific.md) `[LEGACY v1 — Pending v4 Re-audit]` *(วิเคราะห์ 23 พ.ย. 2026 — Verdict: PASS / อย่ารับมีดที่ $42 — ติด Kill Filter หนี้ >3.6x จากดีล Penumbra $14.5B + หั่นเป้า 3 รอบ)*
 
 ---

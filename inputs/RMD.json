@@ -1,0 +1,274 @@
+{
+  "schema_version": "4.0",
+  "ticker": "RMD",
+  "company_name": "ResMed Inc.",
+  "as_of_date": "2026-11-20",
+  "currency": "USD",
+  "analysis_path": "analyses/us/RMD-resmed.md",
+  "_units": "เงินทุกตัวหน่วย $ ล้าน ยกเว้นราคาหุ้นและปันผลต่อหุ้น; ตัวเลข 12 เดือนถึง 30 ก.ย. 2026 (ไตรมาส 1 ปีงบ 2027)",
+  "facts": {
+    "share_price": {
+      "value": 235.63,
+      "unit": "USD/share",
+      "as_of_date": "2026-11-20",
+      "source_url": "https://www.fool.com/quote/nyse/rmd",
+      "filing_ref": "ราคาปิด 20 พ.ย. 2026",
+      "verification": "partially_verified",
+      "note": "ต้องอัปเดตเป็นราคาปิดล่าสุดก่อนตัดสินใจ"
+    },
+    "diluted_shares_m": {
+      "value": 141.3,
+      "unit": "million shares",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://announcements.asx.com.au/asxpdf/20261102/pdf/0763mj72p1mk2d.pdf",
+      "filing_ref": "หุ้นคงค้าง 140,639,154 ณ 30 ก.ย. 2026 + ผลเจือจาง ~0.7M",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "risk_free_yield": {
+      "value": 0.0505,
+      "unit": "rate",
+      "as_of_date": "2026-11-19",
+      "source_url": "https://www.morningstar.com/news/dow-jones/202611198503/10-year-treasury-yield-falls-to-5051-data-talk",
+      "filing_ref": "US 10Y 5.051%",
+      "verification": "verified",
+      "note": ""
+    },
+    "total_debt": {
+      "value": 560.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://announcements.asx.com.au/asxpdf/20261102/pdf/0763mj72p1mk2d.pdf",
+      "filing_ref": "หนี้ระยะสั้น $160M ณ 30 ก.ย. 2026 + หนี้ระยะยาว ~$400M (ยอด 31 มี.ค. 2026 = $404M)",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "total_cash_and_st_inv": {
+      "value": 1011.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://announcements.asx.com.au/asxpdf/20261102/pdf/0763mj72p1mk2d.pdf",
+      "filing_ref": "เงินสด $1,010.7M ณ 30 ก.ย. 2026",
+      "verification": "verified",
+      "note": ""
+    },
+    "customer_float_liability": {
+      "value": 0.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://announcements.asx.com.au/asxpdf/20261102/pdf/0763mj72p1mk2d.pdf",
+      "filing_ref": "ไม่มี",
+      "verification": "verified",
+      "note": ""
+    },
+    "minority_interest": {
+      "value": 0.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://announcements.asx.com.au/asxpdf/20261102/pdf/0763mj72p1mk2d.pdf",
+      "filing_ref": "ไม่มีส่วนได้เสียที่ไม่มีอำนาจควบคุมที่มีนัย",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_revenue": {
+      "value": 5600.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.biopharmawatch.com/news/RMD/resmed-q1-fiscal-year-2027-results",
+      "filing_ref": "ปีงบ 2026 โต ~10% + ไตรมาส 1 ปีงบ 2027 $1,415M เทียบ $1,336M; ไม่รวม MatrixCare ที่ขายไปแล้วบางส่วน",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_core_gaap_ebit": {
+      "value": 2000.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://mfn.se/all/a/resmed/resmed-inc-announces-results-for-the-first-quarter-of-fiscal-year-2027-3bb4e9d9",
+      "filing_ref": "กำไรจากการดำเนินงาน non-GAAP ไตรมาส 1 = $506M (35.8%); ทั้งปีงบ 2027 ตามเป้าราว $2.05–2.1B; หักค่าปรับโครงสร้างที่เกิดเป็นครั้งคราว ~$50M",
+      "verification": "partially_verified",
+      "note": "ใช้ระดับ 12 เดือนย้อนหลัง ต่ำกว่าเป้าปีงบ 2027 เล็กน้อย"
+    },
+    "ttm_depreciation_amort": {
+      "value": 140.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "",
+      "filing_ref": "ค่าเสื่อมราคาไม่รวมค่าตัดจำหน่ายสินทรัพย์จากการซื้อกิจการ (ประมาณจาก PP&E ~$567M)",
+      "verification": "carried_over_unverified",
+      "note": ""
+    },
+    "ttm_capex": {
+      "value": 185.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.biopharmawatch.com/news/RMD/resmed-q1-fiscal-year-2027-results",
+      "filing_ref": "CapEx ไตรมาส 1 = $48M (OCF $422M − FCF $374M); ทั้งปีประมาณ $180–190M",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_sbc": {
+      "value": 85.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "",
+      "filing_ref": "SBC ประมาณการ",
+      "verification": "carried_over_unverified",
+      "note": ""
+    },
+    "ttm_ocf": {
+      "value": 1800.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.biopharmawatch.com/news/RMD/resmed-q1-fiscal-year-2027-results",
+      "filing_ref": "FCF ปีงบ 2026 เกิน $1.6B + ไตรมาส 1 ปีงบ 2027 FCF $374M เทียบ $414M → FCF 12 เดือน ~$1.61B + CapEx ~$185M",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_net_interest_expense": {
+      "value": 5.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "",
+      "filing_ref": "ฐานะเงินสดสุทธิ — ดอกเบี้ยจ่ายใกล้เคียงดอกเบี้ยรับ",
+      "verification": "carried_over_unverified",
+      "note": ""
+    },
+    "annual_dividend_per_share": {
+      "value": 2.64,
+      "unit": "USD/share",
+      "as_of_date": "2026-10-29",
+      "source_url": "https://kalkine.ca/news/corporate-earnings/did-resmed-nysermd-turn-its-matrixcare-exit-into-292-of-quarterly-eps",
+      "filing_ref": "$0.66 ต่อไตรมาส (ขึ้น 10% ในปีงบ 2027)",
+      "verification": "verified",
+      "note": ""
+    }
+  },
+  "assumptions": {
+    "effective_tax_rate": {
+      "value": 0.195,
+      "rationale": "อัตราภาษีปกติของ RMD ราว 19–20%"
+    },
+    "ttm_normal_working_capital_investment": {
+      "value": 80.0,
+      "rationale": "สินค้าคงคลังเพิ่ม ~$75M ในไตรมาส 1 ปีงบ 2027; ใช้ระดับปกติราว 1.5% ของรายได้"
+    },
+    "ttm_float_inflow": {
+      "value": 0.0,
+      "rationale": "ไม่พบเงินสดพิเศษที่ไม่ยั่งยืน (กำไรจากการขาย MatrixCare $62M อยู่นอก OCF)"
+    },
+    "float_cash_coverage_ratio": {
+      "value": 1.0,
+      "rationale": "ไม่มีเงินลูกค้าพักไว้"
+    },
+    "wacc": {
+      "value": 0.0905,
+      "rationale": "พันธบัตร 5.05% + 4.0% เท่ากับ MDT/ZTS เพื่อเทียบกันได้ — คุณภาพสูง แต่มีความเสี่ยงจากยากลุ่ม GLP-1 และการกลับมาของ Philips"
+    },
+    "terminal_growth": {
+      "value": 0.03,
+      "rationale": "ผู้ป่วยโรคหยุดหายใจขณะหลับในสหรัฐได้รับการวินิจฉัยหรือรักษาไม่ถึง 20% — ทางให้โตยาว"
+    },
+    "assumed_incremental_roic": {
+      "value": 0.25,
+      "rationale": "ROIC รวม goodwill ~28%"
+    },
+    "operating_leverage_factor": {
+      "value": 1.0,
+      "rationale": "สมมติ FCF โตเท่ารายได้"
+    }
+  },
+  "reverse_dcf_cases": [
+    {
+      "label": "Flat margin, no extra charge",
+      "margin_change_5y": 0.0,
+      "fine_m": 0.0,
+      "fine_year": 2
+    },
+    {
+      "label": "-300 bps margin (Philips price war)",
+      "margin_change_5y": -0.03,
+      "fine_m": 0.0,
+      "fine_year": 2
+    },
+    {
+      "label": "+150 bps margin (productivity)",
+      "margin_change_5y": 0.015,
+      "fine_m": 0.0,
+      "fine_year": 2
+    }
+  ],
+  "dcf_scenarios": {
+    "Bear (Oral GLP-1 + Philips Return)": {
+      "ufcf_cagr_1_5": -0.01,
+      "ufcf_cagr_6_10": 0.02,
+      "pv_cash_drag": 300.0,
+      "terminal_growth": 0.015,
+      "driver_note": "ยา GLP-1 แบบกิน (orforglipron) ได้ข้อบ่งใช้ OSA และเบิกได้กว้าง ผู้ป่วยใหม่ลด, Philips กลับมาขายในสหรัฐพร้อมตัดราคา, ค่าเบิกอุปกรณ์สิ้นเปลืองถูกกด"
+    },
+    "Conservative (Mid-Single-Digit)": {
+      "ufcf_cagr_1_5": 0.04,
+      "ufcf_cagr_6_10": 0.04,
+      "pv_cash_drag": 150.0,
+      "driver_note": "รายได้โต 4–5% ตามเป้าล่างของบริษัท margin ทรง"
+    },
+    "Base (Core Sleep Compounding)": {
+      "ufcf_cagr_1_5": 0.07,
+      "ufcf_cagr_6_10": 0.06,
+      "pv_cash_drag": 100.0,
+      "driver_note": "รายได้โต 5–7% + margin ขยายช้า ๆ; GLP-1 เป็นตัวช่วยดึงผู้ป่วยเข้ามาวินิจฉัยมากกว่าตัวแย่ง"
+    },
+    "Bull (Diagnosis Funnel Accelerates)": {
+      "ufcf_cagr_1_5": 0.1,
+      "ufcf_cagr_6_10": 0.08,
+      "pv_cash_drag": 50.0,
+      "driver_note": "นาฬิกาอัจฉริยะและ GLP-1 ดึงผู้ป่วยที่ไม่เคยวินิจฉัยเข้าระบบ อัตราซื้อซ้ำสูงขึ้น gross margin ขยายต่อ"
+    }
+  },
+  "irr_model": {
+    "base_clean_fcf_growth": 0.07,
+    "dividend_growth_rate": 0.08,
+    "fcf_allocation_to_buybacks": 0.6,
+    "annual_cash_drag_m": 40.0,
+    "dividend_funding_policy": "strict_fail",
+    "after_tax_debt_cost": 0.04,
+    "exit_multiple_scenarios": {
+      "De-rating (-15% Multiple)": 0.85,
+      "Constant-Multiple Case (1.00x)": 1.0,
+      "Mild Re-rating (+15% Multiple)": 1.15
+    }
+  },
+  "entry_zone_rules": [
+    {
+      "tier": "Starter",
+      "min_mos": 0.15,
+      "min_const_mult_irr": 0.11,
+      "min_rr": 2.0
+    },
+    {
+      "tier": "Core",
+      "min_mos": 0.25,
+      "min_const_mult_irr": 0.13,
+      "min_rr": 3.0
+    },
+    {
+      "tier": "Fat Pitch",
+      "min_mos": 0.35,
+      "min_const_mult_irr": 0.15,
+      "min_rr": 4.0
+    }
+  ],
+  "sensitivity_growth_deltas": [
+    -0.02,
+    -0.01,
+    0.0,
+    0.01,
+    0.02
+  ],
+  "audit_log": [
+    {
+      "date": "2026-11-24",
+      "by": "Claude (full v4 audit)",
+      "change": "สร้าง JSON ครั้งแรกหลังงบไตรมาส 1 ปีงบ 2027 — SBC, D&A และดอกเบี้ยสุทธิยังเป็นค่าประมาณ"
+    }
+  ]
+}

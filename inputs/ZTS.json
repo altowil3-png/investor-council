@@ -1,0 +1,274 @@
+{
+  "schema_version": "4.0",
+  "ticker": "ZTS",
+  "company_name": "Zoetis Inc.",
+  "as_of_date": "2026-11-24",
+  "currency": "USD",
+  "analysis_path": "analyses/us/ZTS-zoetis.md",
+  "_units": "เงินทุกตัวหน่วย $ ล้าน ยกเว้นราคาหุ้นและปันผลต่อหุ้น; ตัวเลข 12 เดือนถึง 30 ก.ย. 2026 เว้นแต่ระบุ",
+  "facts": {
+    "share_price": {
+      "value": 83.82,
+      "unit": "USD/share",
+      "as_of_date": "2026-11-13",
+      "source_url": "https://www.fool.com/quote/nyse/zoetis/zts/",
+      "filing_ref": "ราคาปิด 13 พ.ย. 2026 (ราคาล่าสุดที่ยืนยันได้)",
+      "verification": "partially_verified",
+      "note": "ต้องอัปเดตเป็นราคาปิดล่าสุดก่อนตัดสินใจ"
+    },
+    "diluted_shares_m": {
+      "value": 408.0,
+      "unit": "million shares",
+      "as_of_date": "2026-10-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001555280/000155528026000050/zts-20260930.htm",
+      "filing_ref": "หุ้นคงค้าง 406,316,147 ณ 30 ต.ค. 2026 + ผลเจือจาง ~2M; หุ้นกู้แปลงสภาพ 2029 ยังห่างราคาแปลง",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "risk_free_yield": {
+      "value": 0.0505,
+      "unit": "rate",
+      "as_of_date": "2026-11-19",
+      "source_url": "https://www.morningstar.com/news/dow-jones/202611198503/10-year-treasury-yield-falls-to-5051-data-talk",
+      "filing_ref": "US 10Y 5.051%",
+      "verification": "verified",
+      "note": ""
+    },
+    "total_debt": {
+      "value": 9050.0,
+      "unit": "USD m",
+      "as_of_date": "2026-03-31",
+      "source_url": "https://s203.q4cdn.com/620628704/files/doc_financials/2026/q1/c4e96cbd-41d8-49ad-8df2-882022258c7a.pdf",
+      "filing_ref": "หนี้ระยะยาวสุทธิ $9,045M ณ 31 มี.ค. 2026 (รวมหุ้นกู้แปลงสภาพ 0.25% $2.0B ครบ 2029); ไม่มีการออกหุ้นกู้ใหม่ใน Q2–Q3 ที่พบ",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "total_cash_and_st_inv": {
+      "value": 1600.0,
+      "unit": "USD m",
+      "as_of_date": "2026-06-30",
+      "source_url": "https://stockanalysis.com/stocks/zts/financials/balance-sheet/",
+      "filing_ref": "เงินสด $1,476M + เงินลงทุนระยะสั้น $200M ณ 30 มิ.ย. 2026; Q3 ใช้ซื้อหุ้นคืน $505M",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "customer_float_liability": {
+      "value": 0.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001555280/000155528026000048/exhibit99q32026.htm",
+      "filing_ref": "ไม่มี",
+      "verification": "verified",
+      "note": ""
+    },
+    "minority_interest": {
+      "value": 0.0,
+      "unit": "USD m",
+      "as_of_date": "2025-12-31",
+      "source_url": "https://app.edgar.tools/companies/ZTS",
+      "filing_ref": "ส่วนได้เสียที่ไม่มีอำนาจควบคุม = 0",
+      "verification": "verified",
+      "note": ""
+    },
+    "ttm_revenue": {
+      "value": 9494.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001555280/000155528026000048/exhibit99q32026.htm",
+      "filing_ref": "ปี 2025 $9,467M + 9 เดือน 2026 $7,121M − 9 เดือน 2025 $7,094M",
+      "verification": "verified",
+      "note": ""
+    },
+    "ttm_core_gaap_ebit": {
+      "value": 3350.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001555280/000155528026000048/exhibit99q32026.htm",
+      "filing_ref": "กำไรจากการดำเนินงานที่ปรับแล้วตามเป้าปี 2026 ≈ $3.49B (กำไรสุทธิปรับแล้ว $2.62B ÷ 0.8 + ดอกเบี้ยและอื่น ๆ $215M) − รายการพิเศษที่เกิดเป็นปกติ ~$0.1–0.15B",
+      "verification": "partially_verified",
+      "note": "ใช้ฐานปี 2026 แทน 12 เดือนย้อนหลัง (~$3.7B) เพราะไตรมาส 4/2026 คาดหดตัวแรง"
+    },
+    "ttm_depreciation_amort": {
+      "value": 310.0,
+      "unit": "USD m",
+      "as_of_date": "2026-06-30",
+      "source_url": "https://stockanalysis.com/stocks/zts/financials/cash-flow-statement/",
+      "filing_ref": "D&A 12 เดือน $436M − ค่าตัดจำหน่ายสินทรัพย์จากการซื้อกิจการ ~$125M (Q3 = $31M)",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_capex": {
+      "value": 540.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://stockanalysis.com/stocks/zts/financials/cash-flow-statement/",
+      "filing_ref": "CapEx 12 เดือนถึง มิ.ย. 2026 = $524M; ปี 2025 = $621M",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_sbc": {
+      "value": 95.0,
+      "unit": "USD m",
+      "as_of_date": "2026-06-30",
+      "source_url": "https://stockanalysis.com/stocks/zts/financials/cash-flow-statement/",
+      "filing_ref": "SBC 12 เดือน $95M (ปี 2025 $83M)",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_ocf": {
+      "value": 2773.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://quartr.com/events/zoetis-inc-zts-q3-2026_3epnnrra",
+      "filing_ref": "OCF ปี 2025 $2,904M + 9 เดือน 2026 $1,880M − 9 เดือน 2025 $2,011M",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_net_interest_expense": {
+      "value": 245.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001555280/000155528026000048/exhibit99q32026.htm",
+      "filing_ref": "ดอกเบี้ยจ่ายสุทธิ 9 เดือน 2026 = $185M",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "annual_dividend_per_share": {
+      "value": 2.12,
+      "unit": "USD/share",
+      "as_of_date": "2026-10-27",
+      "source_url": "https://stockanalysis.com/stocks/zts/",
+      "filing_ref": "$0.53 ต่อไตรมาส",
+      "verification": "verified",
+      "note": ""
+    }
+  },
+  "assumptions": {
+    "effective_tax_rate": {
+      "value": 0.2,
+      "rationale": "เป้าอัตราภาษีบนกำไรที่ปรับแล้วปี 2026 ~20%"
+    },
+    "ttm_normal_working_capital_investment": {
+      "value": 200.0,
+      "rationale": "สินค้าคงคลังและลูกหนี้ของ ZTS ใช้เงินทุนหมุนเวียนสูง (9 เดือน 2025 เงินทุนหมุนเวียนดูดเงิน ~$0.58B)"
+    },
+    "ttm_float_inflow": {
+      "value": 150.0,
+      "rationale": "OCF 12 เดือนรวมไตรมาส 4/2025 ที่แข็งผิดปกติจากการปรับรอบปีบัญชีของบริษัทลูกต่างประเทศ (ดันรายได้ต่างประเทศ 2.5–3.5%) ขณะที่ไตรมาส 4/2026 คาดหดตัว — หักออกเพื่อให้เป็นอัตราปกติ"
+    },
+    "float_cash_coverage_ratio": {
+      "value": 1.0,
+      "rationale": "ไม่มีเงินลูกค้าพักไว้"
+    },
+    "wacc": {
+      "value": 0.0905,
+      "rationale": "พันธบัตร 5.05% + 4.0% (Tier 2 ปลายล่าง) — คุณภาพเคยเป็น Tier 1 แต่กำลังเสียส่วนแบ่งในสองธุรกิจหลัก จึงไม่ให้ส่วนลดความเสี่ยง; ใช้เท่ากับ MDT เพื่อเทียบกันได้"
+    },
+    "terminal_growth": {
+      "value": 0.025,
+      "rationale": "ตลาดยาสัตว์เลี้ยงโตระยะยาวราวเงินเฟ้อบวก 1–2%"
+    },
+    "assumed_incremental_roic": {
+      "value": 0.25,
+      "rationale": "ROIC รวม ~24–25% (NOPAT ~$2.7B ÷ ทุน ~$11B)"
+    },
+    "operating_leverage_factor": {
+      "value": 1.0,
+      "rationale": "สมมติ FCF โตเท่ารายได้"
+    }
+  },
+  "reverse_dcf_cases": [
+    {
+      "label": "Flat margin, no extra charge",
+      "margin_change_5y": 0.0,
+      "fine_m": 0.0,
+      "fine_year": 2
+    },
+    {
+      "label": "-200 bps margin (price war)",
+      "margin_change_5y": -0.02,
+      "fine_m": 0.0,
+      "fine_year": 2
+    },
+    {
+      "label": "+100 bps margin (pipeline mix)",
+      "margin_change_5y": 0.01,
+      "fine_m": 0.0,
+      "fine_year": 2
+    }
+  ],
+  "dcf_scenarios": {
+    "Bear (Derm + Paras Erosion, Generic Wave)": {
+      "ufcf_cagr_1_5": -0.03,
+      "ufcf_cagr_6_10": 0.015,
+      "pv_cash_drag": 500.0,
+      "terminal_growth": 0.015,
+      "driver_note": "Zenrelia/Befrena และ Credelio Quattro แย่งส่วนแบ่งต่อ, ยาสามัญตีกลุ่มยาเก่า, Librela ไม่ฟื้น, ต้องลดราคา → FCF หดปีละ 3% ห้าปี"
+    },
+    "Conservative (Low Growth Floor)": {
+      "ufcf_cagr_1_5": 0.015,
+      "ufcf_cagr_6_10": 0.03,
+      "pv_cash_drag": 300.0,
+      "driver_note": "เสียส่วนแบ่งหยุด แต่ยาใหม่แค่ชดเชย; ปศุสัตว์และต่างประเทศพยุง"
+    },
+    "Base (Stabilize, Pipeline From 2028)": {
+      "ufcf_cagr_1_5": 0.035,
+      "ufcf_cagr_6_10": 0.05,
+      "pv_cash_drag": 200.0,
+      "driver_note": "ปี 2027 ทรง ๆ แล้ว Cytopoint ออกฤทธิ์นาน, Simparica Duo, Lenivia/Portela ดันโต 4–6% ตั้งแต่ปี 2028"
+    },
+    "Bull (Pipeline Reasserts Leadership)": {
+      "ufcf_cagr_1_5": 0.07,
+      "ufcf_cagr_6_10": 0.06,
+      "pv_cash_drag": 100.0,
+      "driver_note": "ยาออกฤทธิ์นานดึงส่วนแบ่งคืน, การพบสัตวแพทย์ฟื้น, margin กลับระดับปี 2024–2025"
+    }
+  },
+  "irr_model": {
+    "base_clean_fcf_growth": 0.035,
+    "dividend_growth_rate": 0.04,
+    "fcf_allocation_to_buybacks": 0.5,
+    "annual_cash_drag_m": 60.0,
+    "dividend_funding_policy": "strict_fail",
+    "after_tax_debt_cost": 0.042,
+    "exit_multiple_scenarios": {
+      "De-rating (-15% Multiple)": 0.85,
+      "Constant-Multiple Case (1.00x)": 1.0,
+      "Mild Re-rating (+15% Multiple)": 1.15
+    }
+  },
+  "entry_zone_rules": [
+    {
+      "tier": "Starter",
+      "min_mos": 0.15,
+      "min_const_mult_irr": 0.11,
+      "min_rr": 2.0
+    },
+    {
+      "tier": "Core",
+      "min_mos": 0.25,
+      "min_const_mult_irr": 0.13,
+      "min_rr": 3.0
+    },
+    {
+      "tier": "Fat Pitch",
+      "min_mos": 0.35,
+      "min_const_mult_irr": 0.15,
+      "min_rr": 4.0
+    }
+  ],
+  "sensitivity_growth_deltas": [
+    -0.02,
+    -0.01,
+    0.0,
+    0.01,
+    0.02
+  ],
+  "audit_log": [
+    {
+      "date": "2026-11-24",
+      "by": "Claude (full v4 audit)",
+      "change": "สร้าง JSON ครั้งแรกหลังงบ Q3 2026 — ใช้ฐานกำไรปี 2026 ตามเป้าบริษัทแทน 12 เดือนย้อนหลัง"
+    }
+  ]
+}

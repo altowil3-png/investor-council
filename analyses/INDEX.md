@@ -13,6 +13,7 @@
 | :--- | :--- | :---: | :--- | :---: | :---: | :--- |
 | **BKNG** | Booking Holdings Inc. | $146 (2026-11-23) | **Watchlist** | ~$120 (ช่วง $115–$125) | ~$110 (ช่วง $110–$115) | [BKNG-booking-holdings.md](./us/BKNG-booking-holdings.md) |
 | **MDT** | Medtronic plc | $96.68 (2026-11-24) | **Watchlist** | ~$53 (ช่วง $50–$55) | ~$50 (ช่วง $48–$52) | [MDT-medtronic.md](./us/MDT-medtronic.md) |
+| **ZTS** | Zoetis Inc. | $83.82 (2026-11-24) | **Watchlist** | ~$54 (ช่วง $52–$56) | ~$51 (ช่วง $49–$53) | [ZTS-zoetis.md](./us/ZTS-zoetis.md) |
 <!-- AUTO-SUMMARY:INDEX:END -->
 
 แก้ตัวเลขที่ `inputs/TICKER.json` แล้วรัน `python3 tools/sync_summaries.py --write`

@@ -27,6 +27,7 @@
 **บทวิเคราะห์รุ่น v4** — ตัวเลขสร้างอัตโนมัติจาก `inputs/TICKER.json` ผ่าน `valuation_engine.py` ห้ามแก้ด้วยมือ (CI ตรวจทุก PR):
 
 <!-- AUTO-SUMMARY:README:START -->
+* [ALC — Alcon Inc.](./analyses/us/ALC-alcon.md) *(v4 ณ 2026-11-24 ที่ $76.64 — สถานะ: **Watchlist**; เพดาน Starter ~$47 (ช่วง $45–$49); ผลตอบแทน 5 ปี 10.1%)*
 * [BKNG — Booking Holdings Inc.](./analyses/us/BKNG-booking-holdings.md) *(v4 ณ 2026-11-23 ที่ $146 — สถานะ: **Watchlist**; เพดาน Starter ~$120 (ช่วง $115–$125); ผลตอบแทน 5 ปี 13.3%)*
 * [MDT — Medtronic plc](./analyses/us/MDT-medtronic.md) *(v4 ณ 2026-11-24 ที่ $96.68 — สถานะ: **Watchlist**; เพดาน Starter ~$53 (ช่วง $50–$55); ผลตอบแทน 5 ปี 10.2%)*
 * [RMD — ResMed Inc.](./analyses/us/RMD-resmed.md) *(v4 ณ 2026-11-20 ที่ $235.63 — สถานะ: **Watchlist**; เพดาน Starter ~$165 (ช่วง $160–$170); ผลตอบแทน 5 ปี 10.4%)*

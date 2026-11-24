@@ -1,0 +1,274 @@
+{
+  "schema_version": "4.0",
+  "ticker": "ALC",
+  "company_name": "Alcon Inc.",
+  "as_of_date": "2026-11-24",
+  "currency": "USD",
+  "analysis_path": "analyses/us/ALC-alcon.md",
+  "_units": "เงินทุกตัวหน่วย $ ล้าน ยกเว้นราคาหุ้นและปันผลต่อหุ้น; ตัวเลข 12 เดือนถึง 30 ก.ย. 2026 = 9 เดือนแรกปี 2026 + ไตรมาส 4 ปี 2025; งบตามมาตรฐาน IFRS",
+  "facts": {
+    "share_price": {
+      "value": 76.64,
+      "unit": "USD/share",
+      "as_of_date": "2026-11-24",
+      "source_url": "https://investor.wedbush.com/wedbush/quote?Symbol=NY%3AALC",
+      "filing_ref": "ราคาระหว่างวัน 11:37 น. EST 24 พ.ย. 2026 (ล่าช้า 20 นาที); ปิดวันก่อนหน้า $75.31; ช่วง 52 สัปดาห์ $61.84–87.64",
+      "verification": "partially_verified",
+      "note": "ต้องอัปเดตเป็นราคาปิดล่าสุดก่อนตัดสินใจ"
+    },
+    "diluted_shares_m": {
+      "value": 483.3,
+      "unit": "million shares",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026interimfinancialrepo.htm",
+      "filing_ref": "จำนวนหุ้นเฉลี่ยถ่วงน้ำหนักแบบเจือจาง ไตรมาส 3 ปี 2026 = 483.3M (9 เดือน = 487.4M)",
+      "verification": "verified",
+      "note": ""
+    },
+    "risk_free_yield": {
+      "value": 0.0505,
+      "unit": "rate",
+      "as_of_date": "2026-11-19",
+      "source_url": "https://www.morningstar.com/news/dow-jones/202611198503/10-year-treasury-yield-falls-to-5051-data-talk",
+      "filing_ref": "US 10Y 5.051%",
+      "verification": "verified",
+      "note": "ใช้ค่าเดียวกับ MDT/ZTS/RMD เพื่อเทียบกันได้"
+    },
+    "total_debt": {
+      "value": 4767.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026pressrelease.htm",
+      "filing_ref": "หนี้การเงินรวม $4,767M (ระยะสั้น $78M + ระยะยาว $4,689M); ไม่รวมหนี้สินตามสัญญาเช่า $573M เพราะนับค่าเช่าเป็นค่าใช้จ่ายลงทุนแล้ว",
+      "verification": "verified",
+      "note": ""
+    },
+    "total_cash_and_st_inv": {
+      "value": 1155.0,
+      "unit": "USD m",
+      "as_of_date": "2026-10-20",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026interimfinancialrepo.htm",
+      "filing_ref": "เงินสด $1,705M ณ 30 ก.ย. 2026 − ค่าซื้อ Neurotech $550M ที่จ่าย 20 ต.ค. 2026 (ยังไม่รวมเงินจ่ายตามเป้าหมายในอนาคต)",
+      "verification": "partially_verified",
+      "note": "ปรับเป็นฐานหลังซื้อกิจการ"
+    },
+    "customer_float_liability": {
+      "value": 0.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026interimfinancialrepo.htm",
+      "filing_ref": "ไม่มี",
+      "verification": "verified",
+      "note": ""
+    },
+    "minority_interest": {
+      "value": 0.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026interimfinancialrepo.htm",
+      "filing_ref": "ไม่มีส่วนได้เสียที่ไม่มีอำนาจควบคุมที่มีนัย",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_revenue": {
+      "value": 10886.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026pressrelease.htm",
+      "filing_ref": "9 เดือนปี 2026 $8,184M + ไตรมาส 4 ปี 2025 $2,702M",
+      "verification": "verified",
+      "note": ""
+    },
+    "ttm_core_gaap_ebit": {
+      "value": 2190.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026pressrelease.htm",
+      "filing_ref": "กำไรจากการดำเนินงาน core 9 เดือน $1,734M + ไตรมาส 4 ปี 2025 $514M − เงินคืนภาษีนำเข้า $58M ในไตรมาส 3 (ครั้งเดียว) = $2,190M",
+      "verification": "partially_verified",
+      "note": "core ไม่หักค่าตัดจำหน่ายสินทรัพย์ไม่มีตัวตนจากการซื้อกิจการ (~$620M/ปี, ไม่ใช่เงินสด) และค่าปรับโครงสร้าง (แผน $230M)"
+    },
+    "ttm_depreciation_amort": {
+      "value": 600.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026pressrelease.htm",
+      "filing_ref": "ค่าเสื่อม PP&E 9 เดือน $331M + สินทรัพย์สิทธิการใช้ $77M → 12 เดือน ~$545M + ค่าตัดจำหน่ายซอฟต์แวร์ที่อยู่ใน core (ประมาณ ~$55M)",
+      "verification": "carried_over_unverified",
+      "note": "ส่วนซอฟต์แวร์เป็นค่าประมาณ"
+    },
+    "ttm_capex": {
+      "value": 600.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026interimfinancialrepo.htm",
+      "filing_ref": "ซื้อ PP&E สุทธิ 12 เดือน $513M (= OCF $2,347M − FCF ตามนิยามบริษัท $1,834M; 9 เดือนปี 2026 $344M + ไตรมาส 4 ปี 2025 $169M) + ค่าเช่าตาม IFRS 16 ~$87M (9 เดือน $65M) ที่อยู่ในกิจกรรมจัดหาเงิน",
+      "verification": "partially_verified",
+      "note": "ไม่รวมการซื้อสิทธิ์ผลิตภัณฑ์/สินทรัพย์ไม่มีตัวตน ~$170M/ปี (9 เดือน $136M) — นับเป็นการลงทุนเพื่อโตแบบเดียวกับการซื้อกิจการเล็ก และสะท้อนใน pv_cash_drag / annual_cash_drag_m แทน"
+    },
+    "ttm_sbc": {
+      "value": 160.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026interimfinancialrepo.htm",
+      "filing_ref": "ค่าตอบแทนที่จ่ายเป็นหุ้น 9 เดือน $121M (ปีก่อน $118M) + ไตรมาส 4 ประมาณ ~$40M",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "ttm_ocf": {
+      "value": 2347.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026pressrelease.htm",
+      "filing_ref": "OCF 9 เดือน $1,689M + ไตรมาส 4 ปี 2025 $658M (= ทั้งปี $2,271M − 9 เดือน $1,613M); OCF ตาม IFRS ของ Alcon รวมดอกเบี้ยจ่ายแล้ว",
+      "verification": "verified",
+      "note": "รวมเงินคืนภาษีนำเข้า ~$60M ในไตรมาส 3 (หักออกใน ttm_float_inflow)"
+    },
+    "ttm_net_interest_expense": {
+      "value": 165.0,
+      "unit": "USD m",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026pressrelease.htm",
+      "filing_ref": "ดอกเบี้ยจ่าย 9 เดือน $157M → 12 เดือน ~$210M หักดอกเบี้ยรับ ~$45M (9 เดือนรับเป็นเงินสด $38M); ค่าใช้จ่ายนอกการดำเนินงานทั้งปีตามเป้า $210–230M",
+      "verification": "partially_verified",
+      "note": ""
+    },
+    "annual_dividend_per_share": {
+      "value": 0.36,
+      "unit": "USD/share",
+      "as_of_date": "2026-09-30",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/0001167379/000116737926000033/q32026interimfinancialrepo.htm",
+      "filing_ref": "ปันผลจ่าย 9 เดือน $174M ÷ ~487M หุ้น ≈ $0.36 (จ่ายปีละครั้งเป็น CHF ตามนโยบาย 10% ของกำไร core ปีก่อน)",
+      "verification": "partially_verified",
+      "note": ""
+    }
+  },
+  "assumptions": {
+    "effective_tax_rate": {
+      "value": 0.19,
+      "rationale": "อัตราภาษี core ตามเป้าปี 2026 ~19–20%; ภาษีจ่ายจริงต่ำกว่า (9 เดือน $118M) เพราะค่าตัดจำหน่ายสินทรัพย์จากการซื้อกิจการหักภาษีได้ — ไม่นับประโยชน์นี้เพราะหมดลงเรื่อย ๆ"
+    },
+    "ttm_normal_working_capital_investment": {
+      "value": 160.0,
+      "rationale": "ราว 25% ของรายได้ที่เพิ่ม ~$650M ต่อปี; สินค้าคงคลังเพิ่ม $178M ตั้งแต่ต้นปี"
+    },
+    "ttm_float_inflow": {
+      "value": 60.0,
+      "rationale": "เงินคืนภาษีนำเข้าจากรัฐบาลสหรัฐ ~$60M ในไตรมาส 3 ปี 2026 — เกิดครั้งเดียว"
+    },
+    "float_cash_coverage_ratio": {
+      "value": 1.0,
+      "rationale": "ไม่มีเงินลูกค้าพักไว้"
+    },
+    "wacc": {
+      "value": 0.0905,
+      "rationale": "พันธบัตร 5.05% + 4.0% เท่ากับ MDT/ZTS/RMD เพื่อเทียบกันได้"
+    },
+    "terminal_growth": {
+      "value": 0.03,
+      "rationale": "ประชากรสูงวัย (ต้อกระจก) + สายตาสั้นระบาด + การใช้เลนส์ระดับพรีเมียม; บริษัทประเมินตลาด $35B โตระดับกลางของหลักเดียว"
+    },
+    "assumed_incremental_roic": {
+      "value": 0.15,
+      "rationale": "ROIC รวม goodwill และสินทรัพย์จากการแยกตัวจาก Novartis แค่ ~7%; ไม่รวม ~22% — ใช้ค่ากลางสำหรับเงินลงทุนใหม่ที่ผสมการซื้อกิจการ"
+    },
+    "operating_leverage_factor": {
+      "value": 1.0,
+      "rationale": "สมมติ FCF โตเท่ารายได้"
+    }
+  },
+  "reverse_dcf_cases": [
+    {
+      "label": "Flat margin, no extra charge",
+      "margin_change_5y": 0.0,
+      "fine_m": 0.0,
+      "fine_year": 2
+    },
+    {
+      "label": "-200 bps margin (IOL + lens price pressure)",
+      "margin_change_5y": -0.02,
+      "fine_m": 0.0,
+      "fine_year": 2
+    },
+    {
+      "label": "+300 bps margin (Pershing 25% path)",
+      "margin_change_5y": 0.03,
+      "fine_m": 0.0,
+      "fine_year": 2
+    }
+  ],
+  "dcf_scenarios": {
+    "Bear (Premium IOL Share Loss + Lens Price Reset)": {
+      "ufcf_cagr_1_5": 0.01,
+      "ufcf_cagr_6_10": 0.025,
+      "pv_cash_drag": 1000.0,
+      "terminal_growth": 0.015,
+      "driver_note": "J&J TECNIS PureSee/Odyssey แย่งส่วนแบ่งเลนส์แก้วตาเทียมพรีเมียมต่อ, ราคาคอนแทคเลนส์ที่ขึ้นปีละ ~3 จุดหยุด, margin ติดที่ ~21%, ใช้เงินซื้อสิทธิ์และกิจการต่อโดยไม่ได้ผล"
+    },
+    "Conservative (History Repeats, Margin Stalls)": {
+      "ufcf_cagr_1_5": 0.05,
+      "ufcf_cagr_6_10": 0.04,
+      "pv_cash_drag": 500.0,
+      "driver_note": "รายได้โต ~5% ตามประวัติ margin ขยายน้อยเหมือนเป้าปี 2025 ที่พลาด (ตั้ง ~25% ได้ 19.8%)"
+    },
+    "Base (Mid-Term Plan Partly Delivered)": {
+      "ufcf_cagr_1_5": 0.08,
+      "ufcf_cagr_6_10": 0.06,
+      "pv_cash_drag": 300.0,
+      "driver_note": "รายได้โต ~6% + margin ขยายปีละ ~50–70bp (ต่ำกว่าเป้า 100–150bp ตามที่ผู้บริหารเตือนสำหรับปี 2027)"
+    },
+    "Bull (Pershing Thesis: 25% Margin, Mid-Teens EPS)": {
+      "ufcf_cagr_1_5": 0.12,
+      "ufcf_cagr_6_10": 0.08,
+      "pv_cash_drag": 100.0,
+      "driver_note": "รายได้โต 6–8% ตามเป้าระยะกลาง + margin ไปถึง 25% + AURN001 ได้อนุมัติ → EPS โตกลางสิบ"
+    }
+  },
+  "irr_model": {
+    "base_clean_fcf_growth": 0.08,
+    "dividend_growth_rate": 0.08,
+    "fcf_allocation_to_buybacks": 0.45,
+    "annual_cash_drag_m": 150.0,
+    "dividend_funding_policy": "strict_fail",
+    "after_tax_debt_cost": 0.04,
+    "exit_multiple_scenarios": {
+      "De-rating (-15% Multiple)": 0.85,
+      "Constant-Multiple Case (1.00x)": 1.0,
+      "Mild Re-rating (+15% Multiple)": 1.15
+    }
+  },
+  "entry_zone_rules": [
+    {
+      "tier": "Starter",
+      "min_mos": 0.15,
+      "min_const_mult_irr": 0.11,
+      "min_rr": 2.0
+    },
+    {
+      "tier": "Core",
+      "min_mos": 0.25,
+      "min_const_mult_irr": 0.13,
+      "min_rr": 3.0
+    },
+    {
+      "tier": "Fat Pitch",
+      "min_mos": 0.35,
+      "min_const_mult_irr": 0.15,
+      "min_rr": 4.0
+    }
+  ],
+  "sensitivity_growth_deltas": [
+    -0.02,
+    -0.01,
+    0.0,
+    0.01,
+    0.02
+  ],
+  "audit_log": [
+    {
+      "date": "2026-11-24",
+      "by": "Claude (full v4 audit)",
+      "change": "สร้าง JSON ครั้งแรกหลังงบไตรมาส 3 ปี 2026 (ประกาศ 10 พ.ย.) — ค่าเสื่อมราคาส่วนซอฟต์แวร์และ SBC ไตรมาส 4 ปี 2025 เป็นค่าประมาณ"
+    }
+  ]
+}

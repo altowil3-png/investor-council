@@ -351,11 +351,15 @@ def dcf_enterprise_value(
     g_term: float,
     pv_cash_drag: float = 0.0,
     exit_multiple: Optional[float] = None,
+    explicit_ufcf_1_5: Optional[List[float]] = None,
+    explicit_growth_delta: float = 0.0,
 ) -> float:
     """10-year Explicit DCF + terminal value.
 
     Terminal value = Gordon Growth on year-10 UFCF (default), or — when `exit_multiple` is given —
     year-10 UFCF x exit EV/UFCF multiple (v4: lets a Bear case use e.g. 8-10x instead of a growth formula).
+    When `explicit_ufcf_1_5` (5 annual UFCF values in $M) is provided, years 1-5 use that schedule directly
+    (essential for peak-CapEx cycles where trailing UFCF is negative), then years 6-10 grow from year 5 at g_6_10.
     """
     if exit_multiple is None and wacc <= g_term:
         raise ValueError("WACC must be strictly greater than terminal growth rate.")
@@ -363,10 +367,24 @@ def dcf_enterprise_value(
         raise ValueError("Exit EV/UFCF multiple must be positive.")
     pv = 0.0
     cf = ufcf_0
-    for yr in range(1, 11):
-        g = g_1_5 if yr <= 5 else g_6_10
-        cf *= (1.0 + g)
-        pv += cf / ((1.0 + wacc) ** yr)
+    if explicit_ufcf_1_5 is not None:
+        if len(explicit_ufcf_1_5) != 5:
+            raise ValueError("explicit_ufcf_1_5 must contain exactly 5 annual UFCF values.")
+        for yr, base_cf in enumerate(explicit_ufcf_1_5, 1):
+            base_f = float(base_cf)
+            if explicit_growth_delta != 0.0:
+                cf = base_f + abs(base_f) * (((1.0 + explicit_growth_delta) ** yr) - 1.0)
+            else:
+                cf = base_f
+            pv += cf / ((1.0 + wacc) ** yr)
+        for yr in range(6, 11):
+            cf *= (1.0 + g_6_10)
+            pv += cf / ((1.0 + wacc) ** yr)
+    else:
+        for yr in range(1, 11):
+            g = g_1_5 if yr <= 5 else g_6_10
+            cf *= (1.0 + g)
+            pv += cf / ((1.0 + wacc) ** yr)
     if exit_multiple is not None:
         tv = cf * exit_multiple
     else:
@@ -440,16 +458,30 @@ def simulate_5y_forward_irr(
     policy = str(cfg.get("dividend_funding_policy", "strict_fail"))
     debt_cost = float(cfg.get("after_tax_debt_cost", 0.045))
 
-    if price_0 <= 0.0 or fcf <= 0.0 or shares <= 0.0:
-        return IRRSimulationResult(
-            feasible=False, status="INFEASIBLE_OPERATING_DEFICIT", irr=None, end_price=None,
-            end_shares_m=shares, avg_net_buyback_rate=0.0, ending_free_cash=fs.free_cash_ex_float,
-            total_debt_added=0.0, total_shortfall=0.0, first_shortfall_year=1,
-            dividend_cut_years=[], ledger=[], message="Non-positive starting price, shares, or Clean FCF.",
-        )
+    explicit_fcf = cfg.get("explicit_clean_fcf_1_5")
+    base_g_cfg = float(cfg["base_clean_fcf_growth"])
 
-    m0 = price_0 / (fs.clean_economic_fcf / shares_0)
-    m_exit = m0 * exit_multiple_ratio
+    if explicit_fcf is not None:
+        if len(explicit_fcf) != 5 or price_0 <= 0.0 or shares <= 0.0:
+            return IRRSimulationResult(
+                feasible=False, status="INFEASIBLE_OPERATING_DEFICIT", irr=None, end_price=None,
+                end_shares_m=shares, avg_net_buyback_rate=0.0, ending_free_cash=fs.free_cash_ex_float,
+                total_debt_added=0.0, total_shortfall=0.0, first_shortfall_year=1,
+                dividend_cut_years=[], ledger=[], message="Invalid explicit_clean_fcf_1_5, price, or shares.",
+            )
+        exit_base_mult = float(cfg.get("exit_p_clean_fcf", 20.0))
+        m0 = exit_base_mult
+        m_exit = exit_base_mult * exit_multiple_ratio
+    else:
+        if price_0 <= 0.0 or fcf <= 0.0 or shares <= 0.0:
+            return IRRSimulationResult(
+                feasible=False, status="INFEASIBLE_OPERATING_DEFICIT", irr=None, end_price=None,
+                end_shares_m=shares, avg_net_buyback_rate=0.0, ending_free_cash=fs.free_cash_ex_float,
+                total_debt_added=0.0, total_shortfall=0.0, first_shortfall_year=1,
+                dividend_cut_years=[], ledger=[], message="Non-positive starting price, shares, or Clean FCF.",
+            )
+        m0 = price_0 / (fs.clean_economic_fcf / shares_0)
+        m_exit = m0 * exit_multiple_ratio
 
     cash = fs.free_cash_ex_float
     cum_debt_added = 0.0
@@ -460,9 +492,14 @@ def simulate_5y_forward_irr(
     cash_flows: List[float] = [-price_0]
     infeasible_status: Optional[str] = None
 
+    delta_g = clean_fcf_growth - base_g_cfg
     for yr in range(1, 6):
         beg_cash = cash
-        fcf *= (1.0 + clean_fcf_growth)
+        if explicit_fcf is not None:
+            base_f = float(explicit_fcf[yr - 1])
+            fcf = base_f + abs(base_f) * (((1.0 + delta_g) ** yr) - 1.0) if delta_g != 0.0 else base_f
+        else:
+            fcf *= (1.0 + clean_fcf_growth)
         dps *= (1.0 + div_g)
         extra_interest = cum_debt_added * debt_cost if policy == "external_debt_funded" else 0.0
         fcf_after_extra_int = fcf - extra_interest
@@ -766,6 +803,10 @@ def validate_company_json(raw: Dict[str, object]) -> List[str]:
                 errs.append(f"dcf_scenarios.{name}.terminal_growth must be < wacc")
             if "exit_ev_ufcf_multiple" in cfg and not (_is_number(cfg["exit_ev_ufcf_multiple"]) and cfg["exit_ev_ufcf_multiple"] > 0):
                 errs.append(f"dcf_scenarios.{name}.exit_ev_ufcf_multiple must be > 0")
+            if "explicit_ufcf_1_5" in cfg:
+                ex = cfg["explicit_ufcf_1_5"]
+                if not (isinstance(ex, list) and len(ex) == 5 and all(_is_number(v) for v in ex)):
+                    errs.append(f"dcf_scenarios.{name}.explicit_ufcf_1_5: must be a list of 5 numbers")
             if not str(cfg.get("driver_note", "")).strip():
                 errs.append(f"dcf_scenarios.{name}: needs driver_note")
 
@@ -829,6 +870,7 @@ def scenario_terminal_label(d: Dict[str, object], cfg: Dict[str, object]) -> str
 def scenario_fair_value(d: Dict[str, object], fs: ForensicSummary, cfg: Dict[str, object], growth_delta: float = 0.0) -> float:
     """Per-share fair value of one DCF scenario; growth_delta shifts BOTH 1-5Y and 6-10Y UFCF growth."""
     exit_mult = cfg.get("exit_ev_ufcf_multiple")
+    explicit_1_5 = cfg.get("explicit_ufcf_1_5")
     ev = dcf_enterprise_value(
         fs.unlevered_fcf_pl,
         float(cfg["ufcf_cagr_1_5"]) + growth_delta,
@@ -837,6 +879,8 @@ def scenario_fair_value(d: Dict[str, object], fs: ForensicSummary, cfg: Dict[str
         float(cfg.get("terminal_growth", d["terminal_growth"])),
         float(cfg["pv_cash_drag"]),
         exit_multiple=float(exit_mult) if exit_mult is not None else None,
+        explicit_ufcf_1_5=[float(x) for x in explicit_1_5] if explicit_1_5 is not None else None,
+        explicit_growth_delta=growth_delta if explicit_1_5 is not None else 0.0,
     )
     return (ev - fs.float_adjusted_net_debt - float(d["minority_interest"])) / float(d["diluted_shares_m"])
 
@@ -970,7 +1014,7 @@ def build_summary(d: Dict[str, object]) -> Dict[str, object]:
             "tier_today": a.tier_today or "Watchlist",
         })
 
-    implied = solve_reverse_dcf_ufcf_cagr(fs.float_adjusted_ev, fs.unlevered_fcf_pl, float(d["wacc"]), float(d["terminal_growth"]))
+    implied = solve_reverse_dcf_ufcf_cagr(fs.float_adjusted_ev, fs.unlevered_fcf_pl, float(d["wacc"]), float(d["terminal_growth"])) if fs.unlevered_fcf_pl > 0 else None
     prov = d.get("_provenance", {})
     scenarios = []
     for name, cfg in d["dcf_scenarios"].items():
@@ -978,6 +1022,7 @@ def build_summary(d: Dict[str, object]) -> Dict[str, object]:
         scenarios.append({
             "name": name,
             "g_1_5_pct": round(float(cfg["ufcf_cagr_1_5"]) * 100, 1),
+            "g_1_5_label": f"แผนรายปี (Y5 ${float(cfg['explicit_ufcf_1_5'][-1])/1000:.0f}B)" if "explicit_ufcf_1_5" in cfg else f"{round(float(cfg['ufcf_cagr_1_5']) * 100, 1)}%",
             "g_6_10_pct": round(float(cfg["ufcf_cagr_6_10"]) * 100, 1),
             "terminal": scenario_terminal_label(d, cfg),
             "fair_value": round_to_step(fv, step),
@@ -1032,8 +1077,10 @@ def render_summary_block(s: Dict[str, object]) -> str:
     L.append(f"| **สถานะวันนี้ (ตามกฎ v4)** | **{s['tier_today']}** — {s['tier_reason']} |")
     L.append(f"| มูลค่ากรณีฐาน / กรณีหมี | ~{_fmt_money(s['base_fv'])} / ~{_fmt_money(s['bear_fv'])} (กรณีหมีใช้ {s['bear_terminal']}) |")
     L.append(f"| ส่วนเผื่อความปลอดภัยวันนี้ / อัตราได้ต่อเสีย | {s['mos_today_pct']}% / {s['rr_today']} : 1 |")
-    L.append(f"| ผลตอบแทน 5 ปี ณ ราคาวันนี้ (ตัวคูณคงที่ — ใช้เป็นด่านขั้นต่ำ ไม่ใช่เพดานราคา) | {s['irr_today_pct']}% |")
-    L.append(f"| ตลาดคาด UFCF โตปีละ (reverse DCF ที่ WACC {s['wacc_pct']}%) | {s['implied_ufcf_cagr_pct']}% |")
+    irr_txt = f"{s['irr_today_pct']}%" if s["irr_today_pct"] is not None else "N/A (FCF ติดลบ)"
+    imp_txt = f"{s['implied_ufcf_cagr_pct']}%" if s["implied_ufcf_cagr_pct"] is not None else "N/A (UFCF ติดลบช่วงลงทุนหนัก)"
+    L.append(f"| ผลตอบแทน 5 ปี ณ ราคาวันนี้ (ตัวคูณคงที่ — ใช้เป็นด่านขั้นต่ำ ไม่ใช่เพดานราคา) | {irr_txt} |")
+    L.append(f"| ตลาดคาด UFCF โตปีละ (reverse DCF ที่ WACC {s['wacc_pct']}%) | {imp_txt} |")
     L.append(f"| Clean FCF yield เทียบพันธบัตร 10 ปี | {s['clean_fcf_yield_pct']}% เทียบ {s['risk_free_pct']}% |")
     for t in s["tiers"]:
         r = t["rule"]
@@ -1045,7 +1092,8 @@ def render_summary_block(s: Dict[str, object]) -> str:
     L.append("| Scenario | โตปี 1–5 | โตปี 6–10 | มูลค่าปลายทาง | มูลค่าต่อหุ้น | เทียบราคา |")
     L.append("| :--- | :---: | :---: | :---: | :---: | :---: |")
     for sc in s["scenarios"]:
-        L.append(f"| {sc['name']} | {sc['g_1_5_pct']}% | {sc['g_6_10_pct']}% | {sc['terminal']} | ~{_fmt_money(sc['fair_value'])} | {sc['vs_price_pct']:+.0f}% |")
+        g15_txt = sc.get("g_1_5_label", f"{sc['g_1_5_pct']}%")
+        L.append(f"| {sc['name']} | {g15_txt} | {sc['g_6_10_pct']}% | {sc['terminal']} | ~{_fmt_money(sc['fair_value'])} | {sc['vs_price_pct']:+.0f}% |")
     L.append("")
     L.append("ตารางความอ่อนไหว (เลื่อนอัตราโต FCF กรณีฐานทั้ง 10 ปี):")
     L.append("")
@@ -1081,8 +1129,9 @@ def render_readme_items(summaries: List[Dict[str, object]]) -> str:
     for s in summaries:
         t = {x["tier"]: x for x in s["tiers"]}
         st = t.get("Starter")
+        irr_txt = f"{s['irr_today_pct']}%" if s["irr_today_pct"] is not None else "N/A"
         L.append(f"* [{s['ticker']} — {s['company_name']}](./{s['analysis_path']}) *(v4 ณ {s['as_of_date']} ที่ {_fmt_money(s['price'])} — "
-                 f"สถานะ: **{s['tier_today']}**; เพดาน Starter {_range_txt(st) if st else '-'}; ผลตอบแทน 5 ปี {s['irr_today_pct']}%)*")
+                 f"สถานะ: **{s['tier_today']}**; เพดาน Starter {_range_txt(st) if st else '-'}; ผลตอบแทน 5 ปี {irr_txt})*")
     return "\n".join(L)
 
 
@@ -1120,11 +1169,11 @@ def run_valuation_report(d: Dict[str, object]) -> None:
 
     print("\n[2] REVERSE DCF (MARKET-IMPLIED EXPECTATIONS) — variable, margin path & fines stated explicitly")
     print(f"  WACC = {wacc*100:.2f}%, Terminal g = {g_term*100:.2f}% (Implied Exit EV/UFCF = {1/(wacc-g_term):.1f}x)")
-    ufcf_cagr = solve_reverse_dcf_ufcf_cagr(fs.float_adjusted_ev, fs.unlevered_fcf_pl, wacc, g_term)
-    ufcf_str = f"{ufcf_cagr*100:+.2f}% / yr" if ufcf_cagr is not None else "UNBRACKETED"
+    ufcf_cagr = solve_reverse_dcf_ufcf_cagr(fs.float_adjusted_ev, fs.unlevered_fcf_pl, wacc, g_term) if fs.unlevered_fcf_pl > 0 else None
+    ufcf_str = f"{ufcf_cagr*100:+.2f}% / yr" if ufcf_cagr is not None else "UNBRACKETED (negative TTM UFCF)"
     print(f"  (a) Implied 10Y UFCF CAGR    | no margin change, no fines          : {ufcf_str}")
     for case in d["reverse_dcf_cases"]:
-        rc = solve_reverse_dcf_revenue_cagr(fs.float_adjusted_ev, d, fs, case)
+        rc = solve_reverse_dcf_revenue_cagr(fs.float_adjusted_ev, d, fs, case) if fs.unlevered_fcf_pl > 0 else None
         rc_str = f"{rc*100:+.2f}% / yr" if rc is not None else "UNBRACKETED"
         print(f"  (b) Implied 10Y Revenue CAGR | {case['label']:<36}: {rc_str}")
 
@@ -1147,13 +1196,14 @@ def run_valuation_report(d: Dict[str, object]) -> None:
     print(f"  {'Exit Multiple Scenario':<34} | {'Exit P/FCF':>10} | {'Yr5 Price':>9} | {'Net BB/yr':>9} | {'5Y IRR':>8} | {'Status'}")
     print("  " + "-" * 96)
     const_res: Optional[IRRSimulationResult] = None
+    base_exit_mult = float(d["irr_model"].get("exit_p_clean_fcf", fs.current_p_clean_fcf)) if "explicit_clean_fcf_1_5" in d["irr_model"] else fs.current_p_clean_fcf
     for label, ratio in d["irr_model"]["exit_multiple_scenarios"].items():
         res = simulate_5y_forward_irr(d, fs, base_g, float(ratio))
         if abs(float(ratio) - 1.0) < 1e-9:
             const_res = res
         p_str = f"${res.end_price:>8,.2f}" if res.end_price is not None else "      N/A"
         irr_str = f"{res.irr*100:>+7.2f}%" if res.irr is not None else "     N/A"
-        print(f"  {label:<34} | {fs.current_p_clean_fcf*ratio:>9.1f}x | {p_str} | {res.avg_net_buyback_rate*100:>8.2f}% | {irr_str} | {res.status}")
+        print(f"  {label:<34} | {base_exit_mult*ratio:>9.1f}x | {p_str} | {res.avg_net_buyback_rate*100:>8.2f}% | {irr_str} | {res.status}")
 
     if const_res is not None and const_res.ledger:
         print("\n  [4b] 5-Year Cash Ledger (Constant-Multiple Case, $M)")
@@ -1382,6 +1432,32 @@ def run_v4_self_tests() -> None:
 
     # V4-7: Generated markdown is deterministic (required for the CI drift check).
     assert render_summary_block(build_summary(d_bk)) == render_summary_block(build_summary(load_company_json(bk_path)))
+    n += 1
+
+    # V4-8: Peak-CapEx explicit 5Y schedule (negative TTM UFCF/Clean FCF) enforces cash ledger & monotonic sensitivity.
+    d_pk = deepcopy(COMPANY_DATA)
+    d_pk.update(share_price=100.0, diluted_shares_m=100.0, total_debt=0.0, total_cash_and_st_inv=1000.0,
+                customer_float_liability=0.0, ttm_core_gaap_ebit=200.0, ttm_depreciation_amort=50.0,
+                ttm_ocf=200.0, ttm_capex=400.0, ttm_sbc=50.0, ttm_float_inflow=0.0,
+                annual_dividend_per_share=1.0)
+    d_pk["dcf_scenarios"]["Base (Audited Reality)"]["explicit_ufcf_1_5"] = [-200.0, 100.0, 300.0, 500.0, 700.0]
+    d_pk["dcf_scenarios"]["Bear (AI + EU Squeeze)"]["explicit_ufcf_1_5"] = [-250.0, 50.0, 150.0, 250.0, 350.0]
+    d_pk["irr_model"]["explicit_clean_fcf_1_5"] = [-200.0, 100.0, 300.0, 500.0, 700.0]
+    d_pk["irr_model"]["exit_p_clean_fcf"] = 20.0
+    d_pk["irr_model"]["annual_cash_drag_m"] = 0.0
+    fs_pk = compute_forensic_metrics(d_pk)
+    assert fs_pk.clean_economic_fcf < 0.0 and fs_pk.unlevered_fcf_pl < 0.0
+    r_pk = simulate_5y_forward_irr(d_pk, fs_pk, d_pk["irr_model"]["base_clean_fcf_growth"], 1.0)
+    assert r_pk.feasible and r_pk.status == "OK" and r_pk.irr is not None and r_pk.ledger[0].buyback == 0.0, r_pk
+    # If cash is too low to cover Y1 negative FCF + dividend, strict_fail MUST reject it
+    d_pk_low = deepcopy(d_pk)
+    d_pk_low["total_cash_and_st_inv"] = 100.0
+    r_pk_low = simulate_5y_forward_irr(d_pk_low, compute_forensic_metrics(d_pk_low), d_pk["irr_model"]["base_clean_fcf_growth"], 1.0)
+    assert not r_pk_low.feasible and r_pk_low.status in ("INFEASIBLE_OPERATING_DEFICIT", "INFEASIBLE_UNFUNDED_DIVIDEND"), r_pk_low
+    # Monotonic sensitivity across growth_delta
+    s_pk = build_summary(d_pk)
+    fvs_pk = [r["base_fv"] for r in sorted(s_pk["sensitivity"], key=lambda x: x["growth_delta_pp"])]
+    assert all(a <= b for a, b in zip(fvs_pk, fvs_pk[1:])), fvs_pk
     n += 1
 
     print(f"ALL {n} V4 ACCEPTANCE TESTS PASSED.")

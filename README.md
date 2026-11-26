@@ -29,6 +29,7 @@
 <!-- AUTO-SUMMARY:README:START -->
 * [ALC — Alcon Inc.](./analyses/us/ALC-alcon.md) *(v4 ณ 2026-11-24 ที่ $76.64 — สถานะ: **Watchlist**; เพดาน Starter ~$47 (ช่วง $45–$49); ผลตอบแทน 5 ปี 10.1%)*
 * [BKNG — Booking Holdings Inc.](./analyses/us/BKNG-booking-holdings.md) *(v4 ณ 2026-11-23 ที่ $146 — สถานะ: **Watchlist**; เพดาน Starter ~$120 (ช่วง $115–$125); ผลตอบแทน 5 ปี 13.3%)*
+* [GOOGL — Alphabet Inc.](./analyses/us/GOOGL-alphabet.md) *(v4 ณ 2026-11-25 ที่ $273.10 — สถานะ: **Watchlist**; เพดาน Starter ~$150 (ช่วง $145–$155); ผลตอบแทน 5 ปี 8.1%)*
 * [MDT — Medtronic plc](./analyses/us/MDT-medtronic.md) *(v4 ณ 2026-11-24 ที่ $96.68 — สถานะ: **Watchlist**; เพดาน Starter ~$53 (ช่วง $50–$55); ผลตอบแทน 5 ปี 10.2%)*
 * [RMD — ResMed Inc.](./analyses/us/RMD-resmed.md) *(v4 ณ 2026-11-20 ที่ $235.63 — สถานะ: **Watchlist**; เพดาน Starter ~$165 (ช่วง $160–$170); ผลตอบแทน 5 ปี 10.4%)*
 * [ZTS — Zoetis Inc.](./analyses/us/ZTS-zoetis.md) *(v4 ณ 2026-11-24 ที่ $83.82 — สถานะ: **Watchlist**; เพดาน Starter ~$54 (ช่วง $52–$56); ผลตอบแทน 5 ปี 7.7%)*
@@ -38,7 +39,6 @@
 
 * [UBER — Uber Technologies, Inc.](./analyses/us/UBER-uber-technologies.md) `[LEGACY v1 — Pending v4 Re-audit]` *(วิเคราะห์ 23 พ.ย. 2026 — Split-Brain Debate — Verdict: Small Starter Buy 2%–3% ที่ $60–$64 / Core ≤ $55–$58 — Base DCF $89.82 แต่คุมขนาดรับความเสี่ยง AV & Delivery Hero)*
 * [POOL — Pool Corporation](./analyses/us/POOL-pool-corp.md) `[LEGACY v1 — Pending v4 Re-audit]` *(วิเคราะห์ 23 พ.ย. 2026 — Split-Brain Debate — Verdict: Watchlist / Wait ที่ $208.23; Starter ≤ $180–$188, Core ≤ $155–$170)*
-* [GOOGL — Alphabet Inc.](./analyses/us/GOOGL-alphabet.md) `[LEGACY v1 — Pending v4 Re-audit]` *(วิเคราะห์ 23 พ.ย. 2026 — Split-Brain Debate — Verdict: Watchlist / Wait ที่ $284; Starter ≤ $255–$260, Core ≤ $230–$245)*
 * [BKNG (v2) — ฉบับ AGV เก็บไว้เทียบ](./analyses/us/BKNG-booking-holdings-v2-agv.md) `[LEGACY v1 — Pending v4 Re-audit]` *(ข้อสรุปเดิม BUY $137–$148 ถูกแทนที่ด้วยฉบับ v4 ด้านบน)*
 * [SYK — Stryker Corporation](./analyses/us/SYK-stryker.md) `[LEGACY v1 — Pending v4 Re-audit]` *(วิเคราะห์ 23 พ.ย. 2026 — Verdict: Starter Buy / ทยอยสะสม $295–$310, Core ≤ $275–$285 — ชนะ MDT ชัดเจนในตารางเทียบ)* ⚠️ *ข้อสรุปเดิมนี้ขัดกฎ v4 เอง: ผลตอบแทนกรณีฐาน ~10% ต่ำกว่าด่านขั้นต่ำ 11% ของ Starter*
 * [MDT (v1) — ฉบับ AGV เก็บไว้เทียบ](./analyses/us/MDT-medtronic-v1-agv.md) `[LEGACY v1 — Pending v4 Re-audit]` *(ข้อสรุปเดิม Watchlist ≤ $78–$82 เขียนก่อนงบ Q2 FY27 — ถูกแทนที่ด้วยฉบับ v4 ด้านบน)*
